@@ -16,7 +16,7 @@ async function handlePost(req: Request): Promise<Response> {
         let body: PointsDetails = await req.json();
         await insertToDatabase(body);
 
-        console.log(`sending email to ${body.email}`)
+        console.debug(`sending email to ${body.email}`)
         await sendEmail({
             subject: "Shift Update Notification",
             to: body.email,

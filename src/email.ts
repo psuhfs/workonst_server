@@ -44,7 +44,7 @@ export async function sendEmail(options: EmailOptions): Promise<void> {
         // Send the email
         const info = await transporter.sendMail(mailOptions);
 
-        console.log('Email sent: %s', JSON.stringify(info));
+        console.debug('Email sent: %s', JSON.stringify(info));
     } catch (error) {
         console.error('Error sending email:', error);
         throw error;

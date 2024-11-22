@@ -2,7 +2,7 @@ import mysql from "mysql2/promise";
 import type { PointsDetails } from "./utils.ts";
 
 export async function insertToDatabase(serializedDetails: PointsDetails) {
-    console.log("Inserting into database");
+    console.debug("Inserting into database");
 
     const connection = await mysql.createConnection({
         host: process.env.MYSQL_HOST,
@@ -45,7 +45,7 @@ export async function insertToDatabase(serializedDetails: PointsDetails) {
             points,
         ]);
 
-        console.log(`Points for ${employeeName} successfully inserted into the database.`);
+        console.debug(`Points for ${employeeName} successfully inserted into the database.`);
     } catch (error) {
         throw new Error(`Error inserting data: ${error}`);
     } finally {
