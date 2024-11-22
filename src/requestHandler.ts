@@ -14,14 +14,14 @@ async function handlePost(req: Request): Promise<Response> {
     const url = new URL(req.url);
     if (url.pathname == "/addpoint") {
         let body: PointsDetails = await req.json();
-        console.log(body);
+        await insertToDatabase(body);
+
         console.log("sending email")
         await sendEmail({
             subject: "Shift Update Notification",
             to: body.email,
             text: generateEmailBody(body),
         });
-        await insertToDatabase(body);
 
         return new Response("Email sent");
     }
