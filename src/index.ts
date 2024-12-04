@@ -1,5 +1,6 @@
 import {handleRequest} from "./requestHandler.ts"
 import dotenv from "dotenv";
+import {logError} from "./logger.ts";
 
 dotenv.config()
 
@@ -12,9 +13,11 @@ const server = Bun.serve({
         // generate report every MON 8am
         let response = await handleRequest(request);
         if (response instanceof Error) {
-            console.error("Error handling request:", response); // Log full error details
+            let err = JSON.stringify({error: response.message || "An unknown error occurred"});
+            await logError(err);
+
             return new Response(
-                JSON.stringify({error: response.message || "An unknown error occurred"}),
+                err,
                 {status: 500, headers: {"Content-Type": "application/json"}}
             );
         } else {

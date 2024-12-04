@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer';
+import {logError} from "./logger.ts";
 
 
 interface File {
@@ -46,7 +47,7 @@ export async function sendEmail(options: EmailOptions): Promise<void> {
 
         console.debug('Email sent: %s', JSON.stringify(info));
     } catch (error) {
-        console.error('Error sending email:', error);
+        await logError(`Error sending email: ${error}`);
         throw error;
     }
 }
