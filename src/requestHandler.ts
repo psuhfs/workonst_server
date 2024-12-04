@@ -58,6 +58,9 @@ async function handlePost(req: Request): Promise<Response | Error> {
         await insertToDatabase(body);
 
         console.debug(`sending email to ${body.email}`)
+
+        await insertToDatabase(body);
+
         await sendEmail({
             subject: "Shift Update Notification",
             to: body.email,
