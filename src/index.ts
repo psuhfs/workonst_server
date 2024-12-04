@@ -1,5 +1,6 @@
-import { handleRequest } from "./requestHandler.ts"
+import {handleRequest} from "./requestHandler.ts"
 import dotenv from "dotenv";
+
 dotenv.config()
 
 const server = Bun.serve({
@@ -9,15 +10,15 @@ const server = Bun.serve({
         // html me meal coupon violation
         // db edit
         // generate report every MON 8am
-
-        try {
-            return await handleRequest(request);
-        } catch (e: any) {
-            console.error("Error handling request:", e); // Log full error details
+        let response = await handleRequest(request);
+        if (response instanceof Error) {
+            console.error("Error handling request:", response); // Log full error details
             return new Response(
-                JSON.stringify({ error: e.message || "An unknown error occurred" }),
-                { status: 500, headers: { "Content-Type": "application/json" } }
+                JSON.stringify({error: response.message || "An unknown error occurred"}),
+                {status: 500, headers: {"Content-Type": "application/json"}}
             );
+        } else {
+            return response;
         }
     },
 });

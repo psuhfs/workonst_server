@@ -7,8 +7,10 @@
     "@types/nodemailer": "^6.4.17"
   },
   "dependencies": {
+    "@isaacs/ttlcache": "^1.4.1",
     "dotenv": "^16.4.5",
     "mysql2": "^3.11.4",
+    "node-fetch": "^3.3.2",
     "nodemailer": "^6.9.16",
     "to-csv": "^0.1.1"
   },
