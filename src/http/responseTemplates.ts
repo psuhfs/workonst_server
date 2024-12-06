@@ -48,3 +48,10 @@ export function internalServerError(message: string = "Internal server error"): 
         headers: {"Content-Type": "application/json"}
     }), new CustomError(new Error(body)));
 }
+
+export function success(data: any): CustomResponse {
+    return new CustomResponse(new Response(JSON.stringify(data), {
+        status: 200,
+        headers: {"Content-Type": "application/json"}
+    }));
+}

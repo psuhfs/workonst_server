@@ -4,6 +4,8 @@ import {describe, expect, it, mock} from "bun:test"; // Assuming Bun's test modu
 import {Router} from "../src/http/router";
 import {RequestType} from "../src/http/requestType.ts";
 import {CustomResponse} from "../src/http/response.ts";
+import {TestWebhook} from "./test_helpers/webhook.test.ts";
+import {notFound} from "../src/http/responseTemplates.ts";
 
 describe('Router Tests', () => {
     let router: Router = new Router();
@@ -16,40 +18,63 @@ describe('Router Tests', () => {
     it('should return 200 for known GET route "/"', async () => {
         const request = new Request("http://localhost/", {method: "GET"});
         const response = await router.handle(request);
-        expect(response.getResponse().status).toBe(200);
-        expect(await response.getResponse().text()).toBe("Homepage");
+        let testWebhook = new TestWebhook("");
+        let resp = await response.intoResponse(testWebhook);
+
+        expect(resp.status).toBe(200);
+        expect(await resp.text()).toBe("Homepage");
     });
 
     it('should return 200 for known GET route "/about"', async () => {
         const request = new Request("http://localhost/about", {method: "GET"});
         const response = await router.handle(request);
-        expect(response.getResponse().status).toBe(200);
-        expect(await response.getResponse().text()).toBe("About us");
+
+        let testWebhook = new TestWebhook("");
+        let resp = await response.intoResponse(testWebhook);
+
+        expect(resp.status).toBe(200);
+        expect(await resp.text()).toBe("About us");
     });
 
     it('should return 200 for known POST route "/data"', async () => {
         const request = new Request("http://localhost/data", {method: "POST"});
         const response = await router.handle(request);
-        expect(response.getResponse().status).toBe(200);
-        expect(await response.getResponse().text()).toBe("Data received");
+
+        let testWebhook = new TestWebhook("");
+        let resp = await response.intoResponse(testWebhook);
+
+        expect(resp.status).toBe(200);
+        expect(await resp.text()).toBe("Data received");
     });
 
     it('should return 404 for an unknown route', async () => {
         const request = new Request("http://localhost/unknown", {method: "GET"});
         const response = await router.handle(request);
-        expect(response.getResponse().status).toBe(404);
+
+        let testWebhook = new TestWebhook("{\"error\":\"Not Found\",\"message\":\"not found\"}");
+        let resp = await response.intoResponse(testWebhook);
+
+        expect(resp.status).toBe(404);
     });
 
     it('should handle dynamic routes and return the correct response', async () => {
         const request = new Request("http://localhost/user/123", {method: "GET"});
         const response = await router.handle(request);
-        expect(response.getResponse().status).toBe(200);
-        expect(await response.getResponse().text()).toBe("User ID: 123");
+
+        let testWebhook = new TestWebhook("{\"error\":\"Bad Request\",\"message\":\"HTTP method: PATCH not supported.\"}");
+        let resp = await response.intoResponse(testWebhook);
+
+        expect(resp.status).toBe(200);
+        expect(await resp.text()).toBe("User ID: 123");
     });
 
     it('should return 405 for unsupported methods', async () => {
         const request = new Request("http://localhost/", {method: "PATCH"});
         const response = await router.handle(request);
-        expect(response.getResponse().status).toBe(405);
+
+        let testWebhook = new TestWebhook("{\"error\":\"Bad Request\",\"message\":\"HTTP method: PATCH not supported.\"}");
+        let resp = await response.intoResponse(testWebhook);
+
+        expect(resp.status).toBe(405);
     });
 });

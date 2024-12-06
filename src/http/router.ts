@@ -1,5 +1,5 @@
 import {fromString, type RequestType} from "./requestType.ts";
-import {invalidRequest, methodNotAllowed, notFound} from "./defaultErrResp.ts";
+import {invalidRequest, methodNotAllowed, notFound} from "./responseTemplates.ts";
 import type {CustomError} from "../errors/error.ts";
 import {CustomResponse} from "./response.ts";
 

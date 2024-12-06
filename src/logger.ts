@@ -1,3 +1,6 @@
+/// TODO: drop this file entirely.
+
+
 const WEBHOOK_URL = process.env.WEBHOOK;
 
 if (!WEBHOOK_URL) {
