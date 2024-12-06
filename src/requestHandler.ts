@@ -3,7 +3,6 @@ import {sendEmail} from "./email.ts";
 import {insertToDatabase} from "./mysql.ts";
 import {getEmployee, getEmployees as getEmployees, getShift} from "./employeeRecords.ts";
 
-import { generateAndSendOrderData } from "./stockon/requestHandlerFunctions.ts";
 
 export async function handleRequest(req: Request): Promise<Response | Error> {
     if (req.method === 'POST') return await handlePost(req);
