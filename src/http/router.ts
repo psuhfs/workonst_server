@@ -1,7 +1,9 @@
 import {fromString, type RequestType} from "./requestType.ts";
-import {invalidRequest} from "./defaultErrResp.ts";
+import {invalidRequest, methodNotAllowed, notFound} from "./defaultErrResp.ts";
+import type {CustomError} from "../errors/error.ts";
+import {CustomResponse} from "./response.ts";
 
-type Handler = (req: Request, params: Record<string, string>) => Promise<Response | Error>;
+type Handler = (req: Request, params: Record<string, string>) => Promise<CustomResponse>;
 
 export class Router {
     private routes: Map<RequestType, Map<string, Handler>>;
@@ -17,7 +19,7 @@ export class Router {
         this.routes.get(method)?.set(path, handler);
     }
 
-    public async handle(req: Request): Promise<Response | Error> {
+    public async handle(req: Request): Promise<CustomResponse> {
         const method = fromString(req.method);
         if (method === undefined) {
             return invalidRequest(`HTTP method: ${req.method} not supported.`);
@@ -28,7 +30,7 @@ export class Router {
 
         const methodRoutes = this.routes.get(method);
         if (!methodRoutes) {
-            return new Response("Method Not Allowed", {status: 405});
+            return methodNotAllowed();
         }
 
         const handler = methodRoutes.get(path);
@@ -44,7 +46,7 @@ export class Router {
             }
         }
 
-        return new Response("Not Found", {status: 404});
+        return notFound();
     }
 
     private matchRoute(path: string, route: string): Record<string, string> | null {
