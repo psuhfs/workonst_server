@@ -2,26 +2,25 @@ import {generateEmailBody, type PointsDetails} from "./utils.ts";
 import {sendEmail} from "./email.ts";
 import {insertToDatabase} from "./mysql.ts";
 import {getEmployee, getEmployees as getEmployees, getShift} from "./employeeRecords.ts";
+import {CustomResponse} from "./http/response.ts";
+import {internalServerError, notFound, success} from "./http/responseTemplates.ts";
 
-export async function handleRequest(req: Request): Promise<Response | Error> {
+export async function handleRequest(req: Request): Promise<CustomResponse> {
     if (req.method === 'POST') return await handlePost(req);
     else if (req.method === 'GET') return handleGet(req);
-    else return new Response(`${req.method} requests are not supported`);
+    else return new CustomResponse(new Response(`${req.method} requests are not supported`)); // we don't need to log this error
 }
 
-async function handleGet(req: Request): Promise<Response | Error> {
+async function handleGet(req: Request): Promise<CustomResponse> {
     const url = new URL(req.url);
 
     if (url.pathname.toLowerCase() == "/employees") {
         let url = process.env.GETALL_URL;
         try {
             let value = await getEmployees(url);
-            let resp = new Response(JSON.stringify(value));
-            resp.headers.set("Content-Type", "application/json");
-
-            return resp;
+            return success(JSON.stringify(value));
         } catch (e) {
-            return new Error(`An error occurred while trying to fetch employees: ${e}`);
+            return internalServerError(`An error occurred while trying to fetch employees: ${e}`);
         }
     }
 
@@ -31,24 +30,22 @@ async function handleGet(req: Request): Promise<Response | Error> {
             // check if it's number
             let num = Number.isNaN(parseInt(empNumber, 10));
             if (num) {
-                return new Error("Error parsing Employee Number. The url should be in the form /employee/<number>");
+                return internalServerError("Error parsing Employee Number. The url should be in the form /employee/<number>");
             }
 
             let url = process.env.GETALL_URL;
             let value = await getEmployee(url, empNumber);
-            let resp = new Response(JSON.stringify(value));
-            resp.headers.set("Content-Type", "application/json");
 
-            return resp;
+            return success(JSON.stringify(value));
         } catch (e) {
-            return new Error(`An error occurred while trying to fetch employee: ${e}`);
+            return internalServerError(`An error occurred while trying to fetch employee: ${e}`);
         }
     }
 
-    return new Response(`Invalid route ${url.pathname}`);
+    return notFound(`Invalid route ${url.pathname}`);
 }
 
-async function handlePost(req: Request): Promise<Response | Error> {
+async function handlePost(req: Request): Promise<CustomResponse> {
     const url = new URL(req.url);
     if (url.pathname.toLowerCase() == "/incr") {
 
@@ -67,7 +64,7 @@ async function handlePost(req: Request): Promise<Response | Error> {
             text: generateEmailBody(body),
         });
 
-        return new Response("Email sent");
+        return success("Email sent");
     }
 
     if (url.pathname.toLowerCase() == "/shift") {
@@ -81,13 +78,11 @@ async function handlePost(req: Request): Promise<Response | Error> {
 
             let body = await req.json();
             let value = await getShift(url, body["date"]);
-            let resp = new Response(JSON.stringify(value));
-            resp.headers.set("Content-Type", "application/json");
-            return resp;
+            return success(JSON.stringify(value));
         } catch (e) {
-            return new Error(`An error occurred while trying to fetch shift(s): ${e}`);
+            return internalServerError(`An error occurred while trying to fetch shift(s): ${e}`);
         }
     }
 
-    return new Response(`Invalid route ${url.pathname}`);
+    return notFound(`Invalid route ${url.pathname}`);
 }

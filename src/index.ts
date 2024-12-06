@@ -1,29 +1,28 @@
 import {handleRequest} from "./requestHandler.ts"
 import dotenv from "dotenv";
-import {logError} from "./logger.ts";
+import {DiscordWebhook} from "./webhook/discord.ts";
 
 dotenv.config()
 
-const server = Bun.serve({
-    port: 3000,
-    async fetch(request) {
-        // Points email, (jisko mile h usko email), push all data to SQL
-        // html me meal coupon violation
-        // db edit
-        // generate report every MON 8am
-        let response = await handleRequest(request);
-        if (response instanceof Error) {
-            let err = JSON.stringify({error: response.message || "An unknown error occurred"});
-            await logError(err);
+let dcWebhook = process.env.WEBHOOK;
+if (dcWebhook === undefined) {
+    console.error("Discord webhook not set. Exiting...");
+} else {
+    let webhook = new DiscordWebhook(dcWebhook);
 
-            return new Response(
-                err,
-                {status: 500, headers: {"Content-Type": "application/json"}}
-            );
-        } else {
-            return response;
-        }
-    },
-});
+    const server = Bun.serve({
+        port: 3000,
+        async fetch(request): Promise<Response> {
+            // Points email, (jisko mile h usko email), push all data to SQL
+            // html me meal coupon violation
+            // db edit
+            // generate report every MON 8am
+            return await handleRequest(request).then((c) => {
+                return c.intoResponse(webhook);
+            });
+        },
+    });
 
-console.log(`Listening on http://localhost:${server.port}`);
+    console.log(`Listening on http://localhost:${server.port}`);
+}
+

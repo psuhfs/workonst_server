@@ -1,12 +1,12 @@
 // TODO: rename
 export class CustomError {
-    err: Error;
+    private readonly err: Error;
 
     constructor(debugError: Error) {
         this.err = debugError;
     }
 
-    getDebugError(): Error {
+    getError(): Error {
         return this.err;
     }
 }
