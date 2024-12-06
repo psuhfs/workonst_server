@@ -1,3 +1,7 @@
+// This file contains classes/structures for handling
+// requests and responses.
+// This file should not contain any core logic.
+
 export interface PointsDetails {
     accessCode: string;
     employeeName: string;
