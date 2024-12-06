@@ -2,22 +2,21 @@ import * as XLSX from 'xlsx';
 import { sendEmail } from '../email.ts';
 import type { EmailAttachmentOptions } from '../stockon/utils.ts'; // Import EmailAttachmentOptions type)
 
-export async function generateAndSendExcel({
+export async function generateAndSendOrderData({
     recipient,
     subject,
     message,
     data,
-    fileName = 'order_data.xlsx', // Default file name if not provided
-}: EmailAttachmentOptions): Promise<void> {
+    fileName = 'order_data.xlsx', // default name
+}: EmailAttachmentOptions): Promise<Response | Error> {
     try {
-        // Create a new workbook and worksheet from the data
         const workbook = XLSX.utils.book_new();
         const worksheet = XLSX.utils.json_to_sheet(data);
 
         // Add the worksheet to the workbook
         XLSX.utils.book_append_sheet(workbook, worksheet, 'Data');
 
-        // Write the workbook to a buffer
+        // workbook to buffer
         const buffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'buffer' });
 
         // Send email with the Excel attachment
@@ -33,10 +32,9 @@ export async function generateAndSendExcel({
                 },
             ],
         });
+        return new Response('Email with Excel file sent successfully!');
 
-        console.log('Email with Excel file sent successfully!');
     } catch (error) {
-        console.error('Error generating or sending Excel file:', error);
-        throw error;
+        return new Response(`Error generating or sending Excel file: ${error}`);
     }
 }
