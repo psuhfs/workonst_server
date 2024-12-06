@@ -2,6 +2,22 @@
 // requests and responses.
 // This file should not contain any core logic.
 
+export interface File {
+    filename: string;
+    content: string;
+    contentType?: string;
+    encoding?: string;
+}
+
+export interface EmailOptions {
+    to: string;
+    subject: string;
+    text?: string;
+    html?: string;
+    attachments?: [File];
+}
+
+
 export interface PointsDetails {
     accessCode: string;
     employeeName: string;
