@@ -52,3 +52,4 @@ export async function insertToDatabase(serializedDetails: PointsDetails) {
         await connection.end();
     }
 }
+

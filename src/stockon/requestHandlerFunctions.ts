@@ -1,40 +1,61 @@
-import * as XLSX from 'xlsx';
 import { sendEmail } from '../email.ts';
-import type { EmailAttachmentOptions } from '../stockon/utils.ts'; // Import EmailAttachmentOptions type)
+import type { EmailOptions } from '../interfaces.ts'; // Import EmailOptions type
 
 export async function generateAndSendOrderData({
     recipient,
     subject,
     message,
     data,
-    fileName = 'order_data.xlsx', // default name
-}: EmailAttachmentOptions): Promise<Response | Error> {
+    fileName = 'order_data.csv', // Default name for the CSV file
+}: {
+    recipient: string;
+    subject: string;
+    message: string;
+    data: Record<string, any>[];
+    fileName?: string;
+}): Promise<Response | Error> {
     try {
-        const workbook = XLSX.utils.book_new();
-        const worksheet = XLSX.utils.json_to_sheet(data);
+        const csvContent = convertJsonToCsv(data);
 
-        // Add the worksheet to the workbook
-        XLSX.utils.book_append_sheet(workbook, worksheet, 'Data');
-
-        // workbook to buffer
-        const buffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'buffer' });
-
-        // Send email with the Excel attachment
-        await sendEmail({
+        // Prepare the email options
+        const emailOptions: EmailOptions = {
             to: recipient,
             subject: subject,
             text: message,
             attachments: [
                 {
                     filename: fileName,
-                    content: buffer,
-                    contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                    content: Buffer.from(csvContent, 'utf-8').toString('base64'), // Convert Buffer to base64 string
+                    contentType: 'text/csv',
                 },
             ],
-        });
-        return new Response('Email with Excel file sent successfully!');
+        };
 
+        // Send the email
+        await sendEmail(emailOptions);
+
+        return new Response('Email with CSV file sent successfully!');
     } catch (error) {
-        return new Response(`Error generating or sending Excel file: ${error}`);
+        return new Response(`Error generating or sending CSV file: ${error}`);
     }
+}
+
+// Convert JSON data to CSV format
+function convertJsonToCsv(data: Record<string, any>[]): string {
+    if (data.length === 0) {
+        return '';
+    }
+
+    // Get CSV headers from object keys
+    const headers = Object.keys(data[0]).join(',');
+
+    // Convert each row of data to CSV format
+    const rows = data.map(row =>
+        Object.values(row)
+            .map(value => `"${String(value).replace(/"/g, '""')}"`) // Escape double quotes
+            .join(',')
+    );
+
+    // Combine headers and rows
+    return [headers, ...rows].join('\n');
 }
