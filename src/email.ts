@@ -1,21 +1,21 @@
 import nodemailer from 'nodemailer';
 import {logError} from "./logger.ts";
 
-
-interface File {
+export interface File {
     filename: string;
     content: string;
     contentType?: string;
     encoding?: string;
 }
 
-interface EmailOptions {
+export interface EmailOptions {
     to: string;
     subject: string;
     text?: string;
     html?: string;
     attachments?: [File];
 }
+
 
 export async function sendEmail(options: EmailOptions): Promise<void> {
     try {
