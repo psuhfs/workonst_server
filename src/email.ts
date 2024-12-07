@@ -1,5 +1,4 @@
 import nodemailer from 'nodemailer';
-import {logError} from "./logger.ts";
 import type {Sendable} from "./traits.ts";
 
 interface File {
