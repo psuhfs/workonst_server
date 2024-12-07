@@ -61,7 +61,7 @@ describe('Router Tests', () => {
         const request = new Request("http://localhost/user/123", {method: "GET"});
         const response = await router.handle(request);
 
-        let testWebhook = new TestWebhook("{\"error\":\"Bad Request\",\"message\":\"HTTP method: PATCH not supported.\"}");
+        let testWebhook = new TestWebhook("");
         let resp = await response.intoResponse(testWebhook);
 
         expect(resp.status).toBe(200);

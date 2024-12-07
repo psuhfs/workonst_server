@@ -1,0 +1,140 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["deno"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Biscotti {
+  Item_ID        String? @db.VarChar(255)
+  Name           String? @db.VarChar(255)
+  Unit_Size      String? @db.VarChar(255)
+  Order_Quantity String? @db.VarChar(255)
+  Category       String? @db.VarChar(255)
+  Area           String? @db.VarChar(255)
+
+  @@ignore
+}
+
+model Employees {
+  employee_id     Int    @id @default(autoincrement())
+  employee_number String @unique(map: "employee_number") @db.VarChar(20)
+  employee_name   String @db.VarChar(100)
+  email           String @unique(map: "email") @db.VarChar(100)
+  total_points    Int?   @default(0)
+}
+
+model New_Table_Name {
+  id            Int       @id @default(autoincrement())
+  accessCode    String?   @db.VarChar(255)
+  employeeName  String?   @db.VarChar(255)
+  employeeId    Int?
+  shiftDate     DateTime? @db.Date
+  selectedShift String?   @db.VarChar(255)
+  manualShift   String?   @db.VarChar(255)
+  reason        String?   @db.Text
+  comments      String?   @db.Text
+  email         String?   @db.VarChar(255)
+  points        Int?
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Outpost {
+  Item_ID        String? @db.VarChar(255)
+  Name           String? @db.VarChar(255)
+  Unit_Size      String? @db.VarChar(255)
+  Order_Quantity String? @db.VarChar(255)
+  Category       String? @db.VarChar(255)
+  Area           String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Provisions {
+  Item_ID        String? @db.VarChar(255)
+  Name           String? @db.VarChar(255)
+  Unit_Size      String? @db.VarChar(255)
+  Order_Quantity String? @db.VarChar(255)
+  Category       String? @db.VarChar(255)
+  Area           String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Stacks {
+  Item_ID        String @db.VarChar(10)
+  Name           String @db.VarChar(100)
+  Unit_Size      String @db.VarChar(10)
+  Order_Quantity String @db.VarChar(10000)
+  Category       String @db.VarChar(100)
+  Area           String @db.VarChar(100)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model StockOn {
+  Item_ID        String? @db.VarChar(1024)
+  Name           String? @db.VarChar(1024)
+  Unit_Size      String? @db.VarChar(1024)
+  Order_Quantity BigInt?
+  Category       String? @db.VarChar(1024)
+  Location       String? @db.VarChar(1024)
+  Area           String? @db.VarChar(1024)
+
+  @@ignore
+}
+
+model Test_Points {
+  id            Int       @id @default(autoincrement())
+  accessCode    String?   @db.VarChar(255)
+  employeeName  String?   @db.VarChar(255)
+  employeeId    Int?
+  shiftDate     DateTime? @db.Date
+  selectedShift String?   @db.VarChar(255)
+  manualShift   String?   @db.VarChar(255)
+  reason        String?   @db.Text
+  comments      String?   @db.Text
+  email         String?   @db.VarChar(255)
+  points        Int?
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model employee_total_points {
+  employeeId   Int?
+  employeeName String?  @db.VarChar(255)
+  totalPoints  Decimal? @db.Decimal(32, 0)
+
+  @@ignore
+}
+
+model order_data {
+  id               Int      @id @default(autoincrement())
+  access_code      String   @db.VarChar(50)
+  email_recipients String   @db.Text
+  order_date       DateTime @db.Date
+  location         String   @db.VarChar(100)
+  order_data       String   @db.LongText
+  file_name        String?  @db.VarChar(255)
+  file_size        Int?
+  file_type        String?  @db.VarChar(50)
+  file_content     Bytes?
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model sub_test {
+  Item_ID        String @db.VarChar(255)
+  Name           String @db.VarChar(255)
+  Unit_Size      String @db.VarChar(255)
+  Order_Quantity String @db.VarChar(255)
+  Category       String @db.VarChar(255)
+  Area           String @db.VarChar(255)
+
+  @@ignore
+}

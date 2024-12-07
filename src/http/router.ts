@@ -1,36 +1,94 @@
 import {fromString, type RequestType} from "./requestType.ts";
 import {invalidRequest, methodNotAllowed, notFound} from "./responseTemplates.ts";
-import type {CustomError} from "../errors/error.ts";
 import {CustomResponse} from "./response.ts";
 
 type Handler = (req: Request, params: Record<string, string>) => Promise<CustomResponse>;
 
-export class Router {
-    private routes: Map<RequestType, Map<string, Handler>>;
+interface Doc {
+    description: string,
+    usage?: string,
+}
 
-    constructor() {
-        this.routes = new Map();
+class MatchRouter {
+    private matches: { prefix: string; handler: Handler }[] = [];
+    private readonly parentRouter: Router;
+
+    constructor(parentRouter: Router, prefix: string, handler: Handler) {
+        this.parentRouter = parentRouter;
+        this.match(prefix, handler);
     }
 
-    public add(method: RequestType, path: string, handler: Handler) {
+    public match(prefix: string, handler: Handler): this {
+        this.matches.push({prefix, handler});
+        return this;
+    }
+
+    public finish(errResp: CustomResponse): Router {
+        return this.parentRouter.mergeRight(new Router("", this.matches, errResp));
+    }
+}
+
+export class Router {
+    private routes: Map<RequestType, Map<string, Handler>>;
+    private matches: { prefix: string; handler: Handler }[] = [];
+    private errorResponse?: CustomResponse;
+
+    private readonly prefix?: string;
+
+    constructor(prefix?: string, matches?: { prefix: string; handler: Handler }[], errorResponse?: CustomResponse) {
+        this.routes = new Map();
+        this.errorResponse = errorResponse;
+        if (matches) {
+            this.matches.push(...matches);
+        }
+        this.prefix = prefix;
+    }
+
+    mergeRight(other: Router): Router {
+        this.matches.push(...other.matches);
+        this.errorResponse = other.errorResponse;
+
+        return this;
+    }
+
+    public match(prefix: string, handler: Handler, _doc?: Doc): MatchRouter {
+        return new MatchRouter(this, prefix, handler);
+    }
+
+    public add(method: RequestType, path: string, handler: Handler, _doc?: Doc): Router {
+        if (this.prefix) {
+            path = `${this.prefix}/${path}`;
+        }
+
         if (!this.routes.has(method)) {
             this.routes.set(method, new Map());
         }
         this.routes.get(method)?.set(path, handler);
+
+        return this;
     }
 
     public async handle(req: Request): Promise<CustomResponse> {
-        const method = fromString(req.method);
-        if (method === undefined) {
-            return invalidRequest(`HTTP method: ${req.method} not supported.`);
+        const url = new URL(req.url);
+        let resp = await this.handleReq(req, url);
+        if (resp.isErr()) {
+            return await this.handleMatch(req, url);
         }
 
-        const url = new URL(req.url);
+        return resp;
+    }
+
+    private async handleReq(req: Request, url: URL): Promise<CustomResponse> {
+        const method = fromString(req.method);
+        if (method === undefined) {
+            return invalidRequest(req, `HTTP method: ${req.method} not supported.`);
+        }
+
         const path = url.pathname;
 
         const methodRoutes = this.routes.get(method);
         if (!methodRoutes) {
-            return methodNotAllowed();
+            return methodNotAllowed(`Method ${method} not allowed`);
         }
 
         const handler = methodRoutes.get(path);
@@ -47,6 +105,16 @@ export class Router {
         }
 
         return notFound();
+    }
+
+    private async handleMatch(req: Request, url: URL): Promise<CustomResponse> {
+        for (const match of this.matches) {
+            if (url.pathname.startsWith(match.prefix)) {
+                return match.handler(req, {});
+            }
+        }
+
+        return this.errorResponse || notFound(`Route ${req.url} not supported.`);
     }
 
     private matchRoute(path: string, route: string): Record<string, string> | null {

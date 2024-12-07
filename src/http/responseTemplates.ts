@@ -17,8 +17,8 @@ export function methodNotAllowed(message: string = "Method not allowed"): Custom
     }), new CustomError(new Error(body)));
 }
 
-export function invalidRequest(message: string = "Invalid request"): CustomResponse {
-    const body = JSON.stringify({error: "Bad Request", message});
+export function invalidRequest(req: Request, message: string = "Invalid request"): CustomResponse {
+    const body = JSON.stringify({error: "Bad Request", message, url: req.url});
     return new CustomResponse(new Response(body, {
         status: 405,
         headers: {"Content-Type": "application/json"}
@@ -41,12 +41,14 @@ export function forbidden(message: string = "Forbidden access"): CustomResponse 
     }), new CustomError(new Error(body)));
 }
 
-export function internalServerError(message: string = "Internal server error"): CustomResponse {
+export function internalServerError(message: string = "Internal server error", customError?: string): CustomResponse {
     const body = JSON.stringify({error: "Internal Server Error", message});
+    const errBody = customError ? customError : body;
+
     return new CustomResponse(new Response(body, {
         status: 500,
         headers: {"Content-Type": "application/json"}
-    }), new CustomError(new Error(body)));
+    }), new CustomError(new Error(errBody)));
 }
 
 export function success(data: any): CustomResponse {

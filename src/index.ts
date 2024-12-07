@@ -1,4 +1,4 @@
-import {handleRequest} from "./requestHandler.ts"
+import requestHandler from "./requestHandler.ts"
 import dotenv from "dotenv";
 import {DiscordWebhook} from "./webhook/discord.ts";
 
@@ -17,7 +17,8 @@ if (dcWebhook === undefined) {
             // html me meal coupon violation
             // db edit
             // generate report every MON 8am
-            return await handleRequest(request).then((c) => {
+            return await requestHandler.handle(request).then((c) => {
+                console.debug(c.error());
                 return c.intoResponse(webhook);
             });
         },
