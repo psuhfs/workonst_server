@@ -1,6 +1,8 @@
 import nodemailer from 'nodemailer';
 import type {Sendable} from "./traits.ts";
 
+// TODO: make this typesafe
+
 interface File {
     filename: string;
     content: string;

@@ -1,6 +1,6 @@
-import {Router} from "./http/router.ts";
-import workOn from "./workspace/workon/requestHandler.ts";
-import {notFound} from "./http/responseTemplates.ts";
+import {Router} from "../http/router.ts";
+import workOn from "../workspace/workon/requestHandler.ts";
+import {notFound} from "../http/responseTemplates.ts";
 
 const router = new Router();
 

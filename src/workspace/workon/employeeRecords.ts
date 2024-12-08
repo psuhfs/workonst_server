@@ -1,5 +1,5 @@
 import TTLCache from '@isaacs/ttlcache';
-import type {Employee, EmployeeList, ShiftList} from "../../utils.ts";
+import type {Employee, EmployeeList, ShiftList} from "../../handler/utils.ts";
 
 // Initialize the cache
 const cache = new TTLCache({

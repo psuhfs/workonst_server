@@ -1,7 +1,7 @@
 import type {CustomResponse} from "../../http/response.ts";
-import {Db, prisma} from "../../db.ts";
-import {generateEmailBody, type PointsDetails} from "../../utils.ts";
-import {Email} from "../../email.ts";
+import {Db, prisma} from "../../handler/db.ts";
+import {generateEmailBody, type PointsDetails} from "../../handler/utils.ts";
+import {Email} from "../../handler/email.ts";
 import {internalServerError, success} from "../../http/responseTemplates.ts";
 import {getShift} from "./employeeRecords.ts";
 
