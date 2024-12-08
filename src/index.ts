@@ -1,3 +1,17 @@
+console.log(JSON.stringify({
+    id: 1,
+    accessCode: "abg6200",
+    employeeName: "Sandipsinh Rathod",
+    employeeId: 979678680,
+    shiftDate: "2024-11-22T00:00:00.000Z",
+    selectedShift: "9am - 1pm (Analyst)",
+    manualShift: "",
+    reason: "Tardy",
+    comments: "test",
+    email: "sdr5549@psu.edu",
+    points: 1,
+}))
+
 import requestHandler from "./handler/requestHandler.ts"
 import dotenv from "dotenv";
 import {DiscordWebhook} from "./webhook/discord.ts";
@@ -10,7 +24,7 @@ if (dcWebhook === undefined) {
     console.error("Discord webhook not set. Exiting...");
 } else {
     let webhook = new DiscordWebhook(dcWebhook);
-    startBackgroundTask(webhook);
+    await startBackgroundTask(webhook);
 
     const server = Bun.serve({
         port: 3000,

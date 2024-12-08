@@ -3,14 +3,14 @@ import type {Sendable} from "./traits.ts";
 
 // TODO: make this typesafe
 
-interface File {
+export interface File {
     filename: string;
     content: string;
     contentType?: string;
     encoding?: string;
 }
 
-interface EmailOptions {
+export interface EmailOptions {
     to: string;
     subject: string;
     text?: string;

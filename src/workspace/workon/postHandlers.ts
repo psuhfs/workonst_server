@@ -1,9 +1,43 @@
 import type {CustomResponse} from "../../http/response.ts";
 import {Db, prisma} from "../../handler/db.ts";
-import {generateEmailBody, type PointsDetails} from "../../handler/utils.ts";
+import {type PointsDetails} from "../../handler/utils.ts";
 import {Email} from "../../handler/email.ts";
 import {internalServerError, success} from "../../http/responseTemplates.ts";
 import {getShift} from "./employeeRecords.ts";
+import type {New_Table_Name} from "@prisma/client";
+
+
+function pointDetToTable(body: PointsDetails): New_Table_Name | Error {
+    try {
+        return {
+            accessCode: body.accessCode,
+            employeeName: body.employeeName,
+            employeeId: body.employeeId ? Number.parseInt(body.employeeId, 10) : null,
+            shiftDate: new Date(body.shiftDate),
+            selectedShift: body.selectedShift,
+            manualShift: body.manualShift ? body.manualShift : null,
+            reason: body.reason,
+            comments: body.comments ? body.comments : null,
+            email: body.email,
+            points: body.points
+        };
+    } catch (e: any) {
+        return new Error(e.toString());
+    }
+}
+
+function generateEmailBody(data: PointsDetails): string {
+    let message = `Hello, ${data.employeeName},\n\n`;
+    message += "You have received points. Find attached details:\n";
+    message += `Shift Date: ${data.shiftDate}\n`;
+    message += `Selected Shift: ${data.selectedShift}\n`;
+    message += `Reason: ${data.reason}\n`;
+    message += `Comments: ${data.comments || "N/A"}\n\n`;
+    message += `Points: ${data.points}\n\n`;
+    message += "Thank you,\nStudent Scheduler\n";
+
+    return message;
+}
 
 export async function handleIncr(req: Request): Promise<CustomResponse> {
     const emailSubject = "Shift Update Notification";
@@ -29,7 +63,15 @@ export async function handleIncr(req: Request): Promise<CustomResponse> {
 
         new Email(email).send().then(populateErr);
 
+        let data = pointDetToTable(body);
+        if (data instanceof Error) {
+            errors.push(data);
+        }
+
         if (errors.length == 0) {
+            console.log(await prisma.new_Table_Name.create({
+                data: data
+            }))
             return success({
                 success: "Email sent and Points inserted in db."
             })
