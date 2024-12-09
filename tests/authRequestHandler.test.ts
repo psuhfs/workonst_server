@@ -1,11 +1,8 @@
 import { describe, expect, it, beforeEach } from "bun:test";
-import {prisma} from "../src/handler/db.ts";
 import jwt from "jsonwebtoken";
 import {handleAuth, handleAuthSignin, handleAuthSignup} from "../src/auth/requestHandler.ts";
 import {internalServerError, success, unauthorized} from "../src/http/responseTemplates.ts";
 import {TestWebhook} from "./test_helpers/webhook.test.ts";
-
-console.log(await prisma.crew_leaders.findMany())
 
 describe("Auth function tests", () => {
 
