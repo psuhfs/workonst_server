@@ -14,4 +14,12 @@ export class CustomResponse {
         await webhook.send(this.err);
         return this.response;
     }
+
+    public error(): CustomError | undefined {
+        return this.err;
+    }
+
+    public isErr(): boolean {
+        return !!this.err;
+    }
 }

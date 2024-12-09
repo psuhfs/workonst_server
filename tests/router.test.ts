@@ -61,7 +61,7 @@ describe('Router Tests', () => {
         const request = new Request("http://localhost/user/123", {method: "GET"});
         const response = await router.handle(request);
 
-        let testWebhook = new TestWebhook("{\"error\":\"Bad Request\",\"message\":\"HTTP method: PATCH not supported.\"}");
+        let testWebhook = new TestWebhook("");
         let resp = await response.intoResponse(testWebhook);
 
         expect(resp.status).toBe(200);
@@ -72,9 +72,42 @@ describe('Router Tests', () => {
         const request = new Request("http://localhost/", {method: "PATCH"});
         const response = await router.handle(request);
 
-        let testWebhook = new TestWebhook("{\"error\":\"Bad Request\",\"message\":\"HTTP method: PATCH not supported.\"}");
+        let testWebhook = new TestWebhook("{\"error\":\"Bad Request\",\"message\":\"HTTP method: PATCH not supported.\",\"url\":\"http://localhost/\"}");
         let resp = await response.intoResponse(testWebhook);
 
         expect(resp.status).toBe(405);
     });
+
+    describe("MatchRouter and handleMatch Functionality", () => {
+        const matchRouter = new Router();
+
+        matchRouter
+            .match("/prefix", async () => new CustomResponse(new Response("Prefix matched")))
+            .finish(notFound("Route not found"));
+
+        it("should match a prefix route", async () => {
+            const request = new Request("http://localhost/prefix/test", {method: "GET"});
+            const response = await matchRouter.handle(request);
+
+            let testWebhook = new TestWebhook("");
+            let resp = await response.intoResponse(testWebhook);
+
+            expect(resp.status).toBe(200);
+            expect(await resp.text()).toBe("Prefix matched");
+        });
+
+        it("should return error response for unmatched route", async () => {
+            const request = new Request("http://localhost/unknown", {method: "GET"});
+            const response = await matchRouter.handle(request);
+
+            let err = JSON.stringify({"error": "Not Found", "message": "Route not found"});
+
+            let testWebhook = new TestWebhook(err);
+            let resp = await response.intoResponse(testWebhook);
+
+            expect(resp.status).toBe(404);
+            expect(await resp.text()).toBe(err);
+        });
+    });
+
 });

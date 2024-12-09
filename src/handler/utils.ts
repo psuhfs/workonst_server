@@ -64,16 +64,3 @@ export function deSerializePointsDetails(details: PointsDetails) {
     // Serialize the object to a JSON string
     return JSON.stringify(modifiedDetails);
 }
-
-export function generateEmailBody(data: PointsDetails): string {
-    let message = `Hello, ${data.employeeName},\n\n`;
-    message += "You have received points. Find attached details:\n";
-    message += `Shift Date: ${data.shiftDate}\n`;
-    message += `Selected Shift: ${data.selectedShift}\n`;
-    message += `Reason: ${data.reason}\n`;
-    message += `Comments: ${data.comments || "N/A"}\n\n`;
-    message += `Points: ${data.points}\n\n`;
-    message += "Thank you,\nStudent Scheduler\n";
-
-    return message;
-}
