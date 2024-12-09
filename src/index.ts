@@ -30,4 +30,3 @@ if (dcWebhook === undefined) {
 
     console.log(`Listening on http://localhost:${server.port}`);
 }
-

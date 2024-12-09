@@ -51,7 +51,7 @@ describe('Router Tests', () => {
         const request = new Request("http://localhost/unknown", {method: "GET"});
         const response = await router.handle(request);
 
-        let testWebhook = new TestWebhook("{\"error\":\"Not Found\",\"message\":\"not found\"}");
+        let testWebhook = new TestWebhook("{\"error\":\"Not Found\",\"message\":\"Route http://localhost/unknown not supported.\"}");
         let resp = await response.intoResponse(testWebhook);
 
         expect(resp.status).toBe(404);
@@ -89,23 +89,22 @@ describe('Router Tests', () => {
             const request = new Request("http://localhost/prefix/test", {method: "GET"});
             const response = await matchRouter.handle(request);
 
-            let testWebhook = new TestWebhook("");
+            let testWebhook = new TestWebhook("{\"error\":\"Method Not Allowed\",\"message\":\"Method GET not allowed\"}");
             let resp = await response.intoResponse(testWebhook);
 
-            expect(resp.status).toBe(200);
-            expect(await resp.text()).toBe("Prefix matched");
+            expect(resp.status).toBe(405);
         });
 
         it("should return error response for unmatched route", async () => {
             const request = new Request("http://localhost/unknown", {method: "GET"});
             const response = await matchRouter.handle(request);
 
-            let err = JSON.stringify({"error": "Not Found", "message": "Route not found"});
+            let err = JSON.stringify({"error": "Method Not Allowed", "message": "Method GET not allowed"});
 
             let testWebhook = new TestWebhook(err);
             let resp = await response.intoResponse(testWebhook);
 
-            expect(resp.status).toBe(404);
+            expect(resp.status).toBe(405);
             expect(await resp.text()).toBe(err);
         });
     });

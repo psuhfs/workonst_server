@@ -1,0 +1,65 @@
+{
+  "type": "array",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "",
+  "minItems": 1,
+  "uniqueItems": true,
+  "items": {
+    "type": "object",
+    "required": [
+      "id",
+      "accessCode",
+      "employeeName",
+      "employeeId",
+      "shiftDate",
+      "selectedShift",
+      "manualShift",
+      "reason",
+      "comments",
+      "email",
+      "points"
+    ],
+    "properties": {
+      "id": {
+        "type": "number"
+      },
+      "accessCode": {
+        "type": "string",
+        "minLength": 1
+      },
+      "employeeName": {
+        "type": "string",
+        "minLength": 1
+      },
+      "employeeId": {
+        "type": "number"
+      },
+      "shiftDate": {
+        "type": "string",
+        "minLength": 1
+      },
+      "selectedShift": {
+        "type": "string",
+        "minLength": 1
+      },
+      "manualShift": {
+        "type": "string"
+      },
+      "reason": {
+        "type": "string",
+        "minLength": 1
+      },
+      "comments": {
+        "type": "string",
+        "minLength": 1
+      },
+      "email": {
+        "type": "string",
+        "minLength": 1
+      },
+      "points": {
+        "type": "number"
+      }
+    }
+  }
+}

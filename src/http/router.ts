@@ -71,14 +71,14 @@ export class Router {
     public async handle(req: Request): Promise<CustomResponse> {
         const url = new URL(req.url);
         let resp = await this.handleReq(req, url);
-        if (resp.isErr()) {
-            return await this.handleMatch(req, url, resp);
+        if (resp === null) {
+            return await this.handleMatch(req, url);
         }
 
         return resp;
     }
 
-    private async handleReq(req: Request, url: URL): Promise<CustomResponse> {
+    private async handleReq(req: Request, url: URL): Promise<CustomResponse | null> {
         const method = fromString(req.method);
         if (method === undefined) {
             return invalidRequest(req, `HTTP method: ${req.method} not supported.`);
@@ -104,18 +104,14 @@ export class Router {
             }
         }
 
-        return notFound();
+        return null;
     }
 
-    private async handleMatch(req: Request, url: URL, failingResp: CustomResponse): Promise<CustomResponse> {
+    private async handleMatch(req: Request, url: URL): Promise<CustomResponse> {
         for (const match of this.matches) {
             if (url.pathname.startsWith(match.prefix)) {
                 return match.handler(req, {});
             }
-        }
-
-        if (this.matches.length == 0) {
-            return failingResp;
         }
 
         return this.errorResponse || notFound(`Route ${req.url} not supported.`);
