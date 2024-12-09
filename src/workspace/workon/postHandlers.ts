@@ -2,9 +2,11 @@ import type {CustomResponse} from "../../http/response.ts";
 import {Db, prisma} from "../../handler/db.ts";
 import {type PointsDetails} from "../../handler/utils.ts";
 import {Email} from "../../handler/email.ts";
-import {internalServerError, success} from "../../http/responseTemplates.ts";
+import {internalServerError, success, unauthorized} from "../../http/responseTemplates.ts";
 import {getShift} from "./employeeRecords.ts";
 import type {New_Table_Name} from "@prisma/client";
+import type {Token} from "../../auth/model.ts";
+import {extractTokenDetails, verifyToken} from "../../auth/requestHandler.ts";
 
 
 function pointDetToTable(body: PointsDetails): New_Table_Name | Error {
@@ -46,6 +48,21 @@ export async function handleIncr(req: Request): Promise<CustomResponse> {
 
     try {
 
+        let token = req.headers.get("Authorization");
+        if (!token) {
+            return internalServerError("No token found in the request.");
+        }
+
+        let bearer: Token = {
+            token: token.split(" ")[1],
+        };
+
+        let loggerData = extractTokenDetails(bearer);
+
+        if (!loggerData) {
+            return unauthorized("Invalid token, or token has expired.");
+        }
+
         function populateErr(e: any | Error) {
             if (e instanceof Error) {
                 errors.push(e);
@@ -53,6 +70,9 @@ export async function handleIncr(req: Request): Promise<CustomResponse> {
         }
 
         let body: PointsDetails = await req.json();
+
+        // TODO: this is a bandied fix. Need a better way to handle this.
+        body.accessCode = loggerData["username"];
 
         new Db(prisma.new_Table_Name, body).send().then(populateErr);
         let email = {
@@ -69,9 +89,11 @@ export async function handleIncr(req: Request): Promise<CustomResponse> {
         }
 
         if (errors.length == 0) {
-            console.log(await prisma.new_Table_Name.create({
+            let pointD = await prisma.new_Table_Name.create({
                 data: data
-            }))
+            });
+
+            console.debug(pointD);
             return success({
                 success: "Email sent and Points inserted in db."
             })

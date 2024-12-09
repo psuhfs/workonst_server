@@ -2,7 +2,7 @@ import type {Webhook} from "./traits.ts";
 import type {CustomError} from "../errors/error.ts";
 
 export class DiscordWebhook implements Webhook {
-    webhook: string;
+    private readonly webhook: string;
 
     constructor(webhook: string) {
         this.webhook = webhook;

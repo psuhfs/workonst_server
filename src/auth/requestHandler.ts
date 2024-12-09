@@ -110,7 +110,7 @@ function genToken(body: AuthModel): Token {
     }
 }
 
-function extractTokenDetails(token: Token): any {
+export function extractTokenDetails(token: Token): any {
     try {
         return jwt.verify(token.token, process.env.JWT);
     } catch (e) {

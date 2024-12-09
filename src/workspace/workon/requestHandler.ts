@@ -15,7 +15,7 @@ router
     })
     .add(RequestType.POST, "/incr", handleIncr, {
         description: "Gives a point to an employee for specific shift.",
-        usage: "Expects the body in JSON format which can be serialized to /../src/utils/PointsDetails interface."
+        usage: "Expects the body in JSON format which can be serialized to /../src/utils/PointsDetails interface. And it should have a header 'Authorization': 'Bearer <JWT>'."
     })
     .add(RequestType.POST, "/shifts", handleShifts, {
         description: "Caches and returns list all shifts of all employees"

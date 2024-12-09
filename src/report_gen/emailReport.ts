@@ -1,6 +1,6 @@
 import {createObjectCsvStringifier} from 'csv-writer';
 import {prisma} from "../handler/db.ts";
-import {Email} from "../handler/email.ts";
+import {Email, type File} from "../handler/email.ts";
 import type {Webhook} from "../webhook/traits.ts";
 import {CustomError} from "../errors/error.ts";
 import schedule from 'node-schedule';
@@ -39,6 +39,10 @@ function generateCsv(data: Data[] | Error): string | Error {
     try {
         if (data instanceof Error) {
             return data;
+        }
+
+        if (data.length === 0) {
+            return "";
         }
 
         console.log(data)
@@ -117,21 +121,27 @@ async function sendEmail() {
             <p>Here is the list of employees with points >= 5:</p>
             ${htmlTable}
         `
-        : '<p>No employees have accumulated 5 or more points in the past week.</p>';
+        : '<p>No employees have accumulated 5 or more points.</p>';
 
-    await new Email({
-        subject: "Defaulters update",
-        to: managerEmail,
-        text: "Please find the attached CSV file for the past week's defaulters.",
-        html: emailContent,
-        attachments: [
+
+    let attachments: [File] | undefined;
+
+    if (csv.length !== 0) {
+        attachments = [
             {
                 content: Buffer.from(csv).toString("base64"),
                 encoding: "base64",
                 contentType: "text/csv",
                 filename: "defaultersList.csv",
-            },
-        ],
+            }
+        ];
+    }
+    await new Email({
+        subject: "Defaulters update",
+        to: managerEmail,
+        text: "Please find the attached CSV file for the past week's defaulters.",
+        html: emailContent,
+        attachments: attachments !== undefined ? attachments : undefined,
     })
         .send()
         .then(() => {
