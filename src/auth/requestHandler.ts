@@ -6,7 +6,7 @@ import {prisma} from "../handler/db.ts";
 import {sha256Hash} from "./hasher.ts";
 
 interface SignupDetails {
-    emailid: string,
+    emailid?: string,
     token: string,
 }
 
@@ -76,7 +76,6 @@ async function processAuthSignup(body: AuthModel): Promise<CustomResponse> {
         return unauthorized("No signup details provided.");
     }
     let token = body.signupDetails.token;
-    console.log(token)
 
     let details = extractTokenDetails({token});
 
@@ -98,7 +97,7 @@ async function processAuthSignup(body: AuthModel): Promise<CustomResponse> {
         data: {
             username: body.username,
             password: sha256Hash(body.password),
-            emailid: body.signupDetails.emailid,
+            emailid: body.signupDetails.emailid ? body.signupDetails.emailid: `${body.username}@psu.edu`,
         }
     });
 
@@ -115,7 +114,6 @@ function extractTokenDetails(token: Token): any {
     try {
         return jwt.verify(token.token, process.env.JWT);
     } catch (e) {
-        console.log(e)
         return undefined;
     }
 }
