@@ -2,6 +2,7 @@
 // requests and responses.
 // This file should not contain any core logic.
 
+// WorkOn Interfaces
 export interface PointsDetails {
     accessCode: string;
     employeeName: string;
@@ -63,4 +64,14 @@ export function deSerializePointsDetails(details: PointsDetails) {
 
     // Serialize the object to a JSON string
     return JSON.stringify(modifiedDetails);
+}
+
+
+// StockOn Interfaces
+export interface OrderDetails {
+    email: string;
+    accessCode: string;
+    location: string;
+    deliveryDate: string;
+    items?: {};
 }
