@@ -42,19 +42,21 @@ export async function handleSendEmail(req: Request): Promise<CustomResponse> {
 }
 
 function generateEmailBody(data: OrderDetails): string {
-    let message = `Hello, ${data.accessCode},\n\n`;
+    let message = `Hello, <strong>${data.accessCode}</strong>,\n\n`;
     message += "Please find the attached order data file and a summary table below:\n";
-    message += `Location: ${data.location}\n`;
-    message += `Delivery Date: ${data.deliveryDate}\n`;
+    message += `<p><strong>Location:</strong></p>: ${data.location}\n`;
+    message += `<p><strong>Delivery Date</strong></p>: ${data.deliveryDate}\n`;
 
     let tableRows = "";
-    for (const item of (Array.isArray(data.items) ? data.items : [])) {
-        tableRows += `<tr>
-                        <td>${item.Item_ID}</td>
-                        <td>${item.Name}</td>
-                        <td>${item.Unit_Size}</td>
-                        <td>${item.Order_Quantity}</td>
-                      </tr>`;
+    if (data.items && data.items.length > 0) {
+        for (const item of data.items) {
+            tableRows += `<tr>
+                            <td>${item.Item_ID}</td>
+                            <td>${item.Name}</td>
+                            <td>${item.Unit_Size}</td>
+                            <td>${item.Order_Quantity}</td>
+                          </tr>`;
+        }
     }
     const orderTable = `<table border='1'>
                           <thead>
@@ -75,3 +77,4 @@ function generateEmailBody(data: OrderDetails): string {
 
     return message;
 }
+

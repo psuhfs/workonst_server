@@ -68,10 +68,17 @@ export function deSerializePointsDetails(details: PointsDetails) {
 
 
 // StockOn Interfaces
+export interface OrderItem {
+    Item_ID: string;
+    Name: string;
+    Unit_Size: string;
+    Order_Quantity: string;
+}
+
 export interface OrderDetails {
     email: string;
     accessCode: string;
     location: string;
     deliveryDate: string;
-    items?: {};
+    items?: OrderItem[];
 }
