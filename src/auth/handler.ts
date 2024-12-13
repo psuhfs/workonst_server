@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import type {Token} from "./model.ts";
 import {prisma} from "../handler/db.ts";
 import {sha256Hash} from "./hasher.ts";
+import type {RequestHandler} from "../http/traits.ts";
 
 interface SignupDetails {
     emailid?: string,
@@ -19,8 +20,12 @@ interface AuthModel {
 // TODO: should maintain a map
 export async function handleAuth(req: Request): Promise<CustomResponse> {
     try {
-        let body: Token = await req.json();
-        return await processAuth(body);
+        let token = req.headers.get("Authorization");
+        if (token === null) {
+            return unauthorized("No token provided.");
+        }
+        token = token.replace("Bearer ", "");
+        return await processAuth({token});
     } catch (e: any) {
         return internalServerError("Unable to process auth request.", e.toString());
     }
@@ -32,6 +37,26 @@ export async function handleAuthSignin(req: Request): Promise<CustomResponse> {
         return await processAuthSignin(body);
     } catch (e: any) {
         return internalServerError("Unable to process auth signin request.", e.toString());
+    }
+}
+
+export class SignUpHandler implements RequestHandler {
+    async handle(req: Request, _params: Record<string, string>): Promise<CustomResponse> {
+        return handleAuthSignup(req);
+    }
+
+    async auth(_: Request): Promise<CustomResponse> {
+        return success("Blah");
+    }
+}
+
+export class SignInHandler implements RequestHandler {
+    async handle(req: Request, _params: Record<string, string>): Promise<CustomResponse> {
+        return handleAuthSignin(req);
+    }
+
+    async auth(_: Request): Promise<CustomResponse> {
+        return success("Blah");
     }
 }
 

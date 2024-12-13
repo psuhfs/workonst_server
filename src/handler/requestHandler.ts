@@ -2,19 +2,16 @@ import {Router} from "../http/router.ts";
 import workOn from "../workspace/workon/requestHandler.ts";
 import {notFound} from "../http/responseTemplates.ts";
 import {RequestType} from "../http/requestType.ts";
-import {handleAuth, handleAuthSignin, handleAuthSignup} from "../auth/requestHandler.ts";
+import {SignInHandler, SignUpHandler} from "../auth/handler.ts";
 
 const router = new Router();
 
 router
     // TODO: properly document usage
-    .add(RequestType.POST, "/auth", handleAuth, {
-        description: "Helps to maintain the session.",
-    })
-    .add(RequestType.POST, "/auth/signup", handleAuthSignup, {
+    .add(RequestType.POST, "/auth/signup", new SignUpHandler(), {
         description: "Helps to signup.",
     })
-    .add(RequestType.POST, "/auth/signin", handleAuthSignin, {
+    .add(RequestType.POST, "/auth/signin", new SignInHandler(), {
         description: "Helps to signin.",
     })
     .match("/workon", workOn.handle, {

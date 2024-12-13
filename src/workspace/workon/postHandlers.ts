@@ -2,11 +2,11 @@ import type {CustomResponse} from "../../http/response.ts";
 import {Db, prisma} from "../../handler/db.ts";
 import {type PointsDetails} from "../../handler/utils.ts";
 import {Email} from "../../handler/email.ts";
-import {internalServerError, success, unauthorized} from "../../http/responseTemplates.ts";
+import {internalServerError, invalidRequest, success, unauthorized} from "../../http/responseTemplates.ts";
 import {getShift} from "./employeeRecords.ts";
 import type {New_Table_Name} from "@prisma/client";
-import type {Token} from "../../auth/model.ts";
-import {extractTokenDetails, verifyToken} from "../../auth/requestHandler.ts";
+import {extractTokenDetails, handleAuth} from "../../auth/handler.ts";
+import type {RequestHandler} from "../../http/traits.ts";
 
 
 function pointDetToTable(body: PointsDetails): New_Table_Name | Error {
@@ -41,100 +41,142 @@ function generateEmailBody(data: PointsDetails): string {
     return message;
 }
 
-export async function handleIncr(req: Request): Promise<CustomResponse> {
-    const emailSubject = "Shift Update Notification";
-    const failureMsg = "Failed to send email/insert data in DB";
-    let errors: Error[] = [];
+export class IncrHandler implements RequestHandler {
+    private body: PointsDetails | null = null;
+    async handle(req: Request, _params: Record<string, string>): Promise<CustomResponse> {
+        return this.handleIncr(req);
+    }
 
-    try {
-
-        let token = req.headers.get("Authorization");
-        if (!token) {
-            return internalServerError("No token found in the request.");
-        }
-
-        let bearer: Token = {
-            token: token.split(" ")[1],
-        };
-
-        let loggerData = extractTokenDetails(bearer);
-
-        if (!loggerData) {
-            return unauthorized("Invalid token, or token has expired.");
-        }
-
-        function populateErr(e: any | Error) {
-            if (e instanceof Error) {
-                errors.push(e);
+    async auth(req: Request): Promise<CustomResponse> {
+        try {
+            let token = req.headers.get("Authorization");
+            if (!token) {
+                return unauthorized("No token found in the request.");
             }
+            token = token.replace("Bearer ", "");
+            let details = extractTokenDetails({token});
+            if (!details) {
+                return unauthorized("Invalid token, or token has expired.");
+            }
+            let username = details["username"];
+            if (!username) {
+                return unauthorized("Invalid token, or token has expired.");
+            }
+            let body: PointsDetails = await req.json();
+            if (username !== body.accessCode) {
+                return unauthorized("You are not authorized to perform this action.");
+            }
+            this.body = body;
+        }catch (e: any) {
+            return internalServerError("An error occurred while trying to authenticate the request.", e.toString());
         }
+        return success("Blah");
+    }
 
-        let body: PointsDetails = await req.json();
+    async handleIncr(req: Request): Promise<CustomResponse> {
+        const emailSubject = "Shift Update Notification";
+        const failureMsg = "Failed to send email/insert data in DB";
+        let errors: Error[] = [];
 
-        // TODO: this is a bandied fix. Need a better way to handle this.
-        body.accessCode = loggerData["username"];
+        try {
 
-        new Db(prisma.new_Table_Name, body).send().then(populateErr);
-        let email = {
-            subject: emailSubject,
-            to: body.email,
-            text: generateEmailBody(body),
-        };
+            function populateErr(e: any | Error) {
+                if (e instanceof Error) {
+                    errors.push(e);
+                }
+            }
 
-        new Email(email).send().then(populateErr);
+            if (this.body === null) {
+                return invalidRequest(req, "No body found in request.");
+            }
 
-        let data = pointDetToTable(body);
-        if (data instanceof Error) {
-            errors.push(data);
-        }
+            let body: PointsDetails = this.body;
 
-        if (errors.length == 0) {
-            let pointD = await prisma.new_Table_Name.create({
-                data: data
-            });
+            new Db(prisma.new_Table_Name, body).send().then(populateErr);
+            let email = {
+                subject: emailSubject,
+                to: body.email,
+                text: generateEmailBody(body),
+            };
 
-            console.debug(pointD);
-            return success({
-                success: "Email sent and Points inserted in db."
-            })
-        } else {
+            new Email(email).send().then(populateErr);
+
+            let data = pointDetToTable(body);
+            if (data instanceof Error) {
+                errors.push(data);
+            }
+
+            if (errors.length == 0) {
+                let pointD = await prisma.new_Table_Name.create({
+                    data: data
+                });
+
+                console.debug(pointD);
+                return success({
+                    success: "Email sent and Points inserted in db."
+                })
+            } else {
+                return internalServerError(failureMsg, JSON.stringify({
+                    email,
+                    db: body,
+                    errors: errors.map(i => i.toString())
+                }));
+            }
+        } catch (e: Error | any) {
+            if (e instanceof Error) {
+                console.debug(e);
+            }
             return internalServerError(failureMsg, JSON.stringify({
-                email,
-                db: body,
-                errors: errors.map(i => i.toString())
-            }));
+                exception: e.toString(),
+                errors: errors.map(i => i.toString()),
+            }))
         }
-    } catch (e: any) {
-        return internalServerError(failureMsg, JSON.stringify({
-            exception: e.toString(),
-            errors: errors.map(i => i.toString()),
-        }))
     }
 }
 
-export async function handleShifts(req: Request): Promise<CustomResponse> {
-    try {
-        let url = process.env.GETALL_URL;
-        let body = await req.json();
-        let value = await getShift(url, body["date"]);
+export class ShiftsHandler implements RequestHandler {
+    async handle(req: Request, _params: Record<string, string>): Promise<CustomResponse> {
+        return this.handleShifts(req);
+    }
 
-        return success(value);
-    } catch (e) {
-        return internalServerError(`An error occurred while trying to fetch shift(s): ${e}`);
+    async auth(req: Request): Promise<CustomResponse> {
+        return handleAuth(req);
+    }
+
+    async handleShifts(req: Request): Promise<CustomResponse> {
+        try {
+            let url = process.env.GETALL_URL;
+            let body = await req.json();
+            let value = await getShift(url, body["date"]);
+
+            return success(value);
+        } catch (e) {
+            return internalServerError(`An error occurred while trying to fetch shift(s): ${e}`);
+        }
     }
 }
 
-export async function handleShift(req: Request, parts: Record<string, string>): Promise<CustomResponse> {
-    try {
-        const employeeId = parts["id"];
-        const url = process.env.GETALL_URL;
-        let body = await req.json();
-        let value = await getShift(url, body["date"]);
-        let shift = value.AssignedShiftList.find((v) => v.EMPLOYEE_NUMBER == employeeId);
-        let resp = shift ? JSON.stringify(shift) : "{}";
+export class ShiftHandler implements RequestHandler {
+    async handle(req: Request, params: Record<string, string>): Promise<CustomResponse> {
+        return this.handleShift(req, params);
+    }
 
-        return success(resp);
-    } catch (e) {
-        return internalServerError(`An error occurred while trying to fetch shift(s): ${e}`);
+    async auth(req: Request): Promise<CustomResponse> {
+        return handleAuth(req);
+    }
+
+    async handleShift(req: Request, parts: Record<string, string>): Promise<CustomResponse> {
+        try {
+            const employeeId = parts["id"];
+            const url = process.env.GETALL_URL;
+            let body = await req.json();
+            let value = await getShift(url, body["date"]);
+            let shift = value.AssignedShiftList.find((v) => v.EMPLOYEE_NUMBER == employeeId);
+            let resp = shift ? JSON.stringify(shift) : "{}";
+
+            return success(resp);
+        } catch (e) {
+            return internalServerError(`An error occurred while trying to fetch shift(s): ${e}`);
+        }
     }
 }

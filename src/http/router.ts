@@ -1,12 +1,27 @@
 import {fromString, type RequestType} from "./requestType.ts";
-import {invalidRequest, methodNotAllowed, notFound} from "./responseTemplates.ts";
+import {invalidRequest, methodNotAllowed, notFound, success} from "./responseTemplates.ts";
 import {CustomResponse} from "./response.ts";
+import type {RequestHandler} from "./traits.ts";
 
 type Handler = (req: Request, params: Record<string, string>) => Promise<CustomResponse>;
 
 interface Doc {
     description: string,
     usage?: string,
+}
+
+class MatchesHandler implements RequestHandler {
+    constructor(private readonly handler: Handler) {
+        this.handler = handler;
+    }
+
+    async handle(req: Request, params: Record<string, string>): Promise<CustomResponse> {
+        return this.handler(req, params);
+    }
+
+    async auth(_: Request): Promise<CustomResponse> {
+        return success("Blah");
+    }
 }
 
 class MatchRouter {
@@ -24,18 +39,25 @@ class MatchRouter {
     }
 
     public finish(errResp: CustomResponse): Router {
-        return this.parentRouter.mergeRight(new Router("", this.matches, errResp));
+        let newMatches = [];
+        for (const i of this.matches) {
+            newMatches.push({prefix: i.prefix, handler: new MatchesHandler(i.handler)});
+        }
+        return this.parentRouter.mergeRight(new Router("", newMatches, errResp));
     }
 }
 
 export class Router {
-    private routes: Map<RequestType, Map<string, Handler>>;
-    private matches: { prefix: string; handler: Handler }[] = [];
+    private routes: Map<RequestType, Map<string, RequestHandler>>;
+    private matches: { prefix: string; handler: RequestHandler }[] = [];
     private errorResponse?: CustomResponse;
 
     private readonly prefix?: string;
 
-    constructor(prefix?: string, matches?: { prefix: string; handler: Handler }[], errorResponse?: CustomResponse) {
+    constructor(prefix?: string, matches?: {
+        prefix: string;
+        handler: RequestHandler
+    }[], errorResponse?: CustomResponse) {
         this.routes = new Map();
         this.errorResponse = errorResponse;
         if (matches) {
@@ -55,7 +77,7 @@ export class Router {
         return new MatchRouter(this, prefix, handler);
     }
 
-    public add(method: RequestType, path: string, handler: Handler, _doc?: Doc): Router {
+    public add(method: RequestType, path: string, handler: RequestHandler, _doc?: Doc): Router {
         if (this.prefix) {
             path = `${this.prefix}/${path}`;
         }
@@ -93,14 +115,22 @@ export class Router {
 
         const handler = methodRoutes.get(path);
         if (handler) {
-            return handler(req, {});
+            let auth = await handler.auth(req);
+            if (auth.isErr()) {
+                return auth;
+            }
+            return handler.handle(req, {});
         }
 
         // Optional: Fuzzy matching for dynamic routes
         for (const [route, handler] of methodRoutes) {
             const match = this.matchRoute(path, route);
             if (match) {
-                return handler(req, match);
+                let auth = await handler.auth(req);
+                if (auth.isErr()) {
+                    return auth;
+                }
+                return handler.handle(req, match);
             }
         }
 
@@ -110,7 +140,11 @@ export class Router {
     private async handleMatch(req: Request, url: URL): Promise<CustomResponse> {
         for (const match of this.matches) {
             if (url.pathname.startsWith(match.prefix)) {
-                return match.handler(req, {});
+                let auth = await match.handler.auth(req);
+                if (auth.isErr()) {
+                    return auth;
+                }
+                return match.handler.handle(req, {});
             }
         }
 
