@@ -38,7 +38,7 @@ export class StockEmailSender implements RequestHandler {
                 })
             }
 
-            await email.send().then();
+            await email.send();
 
             // prisma.table_name.operation
             await prisma.order_data.create({
@@ -49,9 +49,9 @@ export class StockEmailSender implements RequestHandler {
                     location: body.location,
                     order_data: JSON.stringify(body.items),
                     file_name: "order_data.csv",
-                    file_size: null,
-                    file_type: null,
-                    file_content: null
+                    file_size: csvFile.length,
+                    file_type: "text/csv",
+                    file_content: Uint8Array.from(Buffer.from(csvFile))
                 }
             });
 
