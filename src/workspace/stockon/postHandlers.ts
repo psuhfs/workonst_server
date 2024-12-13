@@ -20,6 +20,7 @@ export async function handleSendEmail(req: Request): Promise<CustomResponse> {
 
         await email.send().then();
 
+        // prisma.table_name.operation
         await prisma.order_data.create({
             data: {
                 access_code: body.accessCode,
