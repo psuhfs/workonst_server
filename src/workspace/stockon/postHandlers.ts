@@ -3,19 +3,19 @@ import type {CustomResponse} from "../../http/response.ts";
 import {type OrderDetails} from "../../handler/utils.ts";
 import {prisma} from "../../handler/db.ts";
 import {Email} from "../../handler/email.ts";
+import { generateCsvFromItems } from "./generateOrderFile.ts";
 
 export async function handleSendEmail(req: Request): Promise<CustomResponse> {
     try {
-        // return success("Email sent"); // placeholder
-
         const body: OrderDetails = await req.json();
         const emailContent = generateEmailBody(body);
+        const csvFile = await generateCsvFromItems(body);
 
         const email = new Email({
             to: body.email,
             subject: "Order Details",
-            text: emailContent,
-            // html: emailContent // will use if email content does not work
+            // text: emailContent, // will use if html does not work
+            html: emailContent
         });
 
         await email.send().then();
@@ -27,7 +27,7 @@ export async function handleSendEmail(req: Request): Promise<CustomResponse> {
                 order_date: new Date(body.deliveryDate),
                 location: body.location,
                 order_data: JSON.stringify(body.items),
-                file_name: null,
+                file_name: "order_data.csv",
                 file_size: null,
                 file_type: null,
                 file_content: null

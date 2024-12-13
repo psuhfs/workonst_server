@@ -1,10 +1,12 @@
 import { createObjectCsvWriter } from "csv-writer";
 import {type OrderDetails} from "../../handler/utils.ts";
+import { CustomResponse } from "../../http/response.ts";
+import { internalServerError, success } from "../../http/responseTemplates.ts";
 
-async function generateCsvFromItems(orderDetails: OrderDetails) {
+export async function generateCsvFromItems(orderDetails: OrderDetails): Promise<CustomResponse> {
     if (!orderDetails.items || orderDetails.items.length === 0) {
         console.error("No items to write to CSV.");
-        return;
+        return internalServerError("No items to write to CSV.");
     }
 
     const csvWriter = createObjectCsvWriter({
@@ -19,8 +21,8 @@ async function generateCsvFromItems(orderDetails: OrderDetails) {
 
     try {
         await csvWriter.writeRecords(orderDetails.items);
-        console.log('CSV file created successfully.');
+        return success("CSV file created successfully.");
     } catch (error) {
-        console.error('Error writing CSV file:', error);
+        return internalServerError(`Error writing CSV file: ${error}`);
     }
 }

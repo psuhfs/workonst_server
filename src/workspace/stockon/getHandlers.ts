@@ -1,10 +1,10 @@
 import {internalServerError, success} from "../../http/responseTemplates.ts";
 import type {CustomResponse} from "../../http/response.ts";
 
-export async function handlePopulateTable(_: Request): Promise<CustomResponse> {
+export async function handleGetItems(_: Request): Promise<CustomResponse> {
     try {
-        return success("Populated table"); // placeholder
+        return success("getting items..."); // placeholder
     } catch (e) {
-        return internalServerError(`An error occurred while trying to populate table: ${e}`);
+        return internalServerError(`An error occurred while trying to get items: ${e}`);
     }
 }
