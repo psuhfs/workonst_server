@@ -1,16 +1,16 @@
 import {Router} from "../../http/router.ts";
 import {RequestType} from "../../http/requestType.ts";
-import {handleGetItems} from "./getHandlers.ts";
-import {handleSendEmail} from "./postHandlers.ts";
+import {StockEmailSender} from "./postHandlers.ts";
+import {GetItems} from "./getHandlers.ts";
 
 const router = new Router("/stockon");
 
 router
-    .add(RequestType.GET, "/getItems", handleGetItems, {
+    .add(RequestType.GET, "/getItems", new GetItems(), {
         description: "Populates the table with stock data based on params",
     })
-    
-    .add(RequestType.POST, "/sendMail", handleSendEmail, {
+
+    .add(RequestType.POST, "/sendMail", new StockEmailSender(), {
         description: "Sends email to logged in user and specified organization members",
     });
 

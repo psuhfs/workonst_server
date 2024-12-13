@@ -3,43 +3,65 @@ import type {CustomResponse} from "../../http/response.ts";
 import {type OrderDetails} from "../../handler/utils.ts";
 import {prisma} from "../../handler/db.ts";
 import {Email} from "../../handler/email.ts";
-import { generateCsvFromItems } from "./generateOrderFile.ts";
+import {generateCsvFromItems} from "./generateOrderFile.ts";
+import type {RequestHandler} from "../../http/traits.ts";
+import {handleAuth} from "../../auth/handler.ts";
 
-export async function handleSendEmail(req: Request): Promise<CustomResponse> {
-    try {
-        const body: OrderDetails = await req.json();
-        const emailContent = generateEmailBody(body);
-        const csvFile = await generateCsvFromItems(body);
+// TODO: needs design change in DB
 
-        const email = new Email({
-            to: body.email,
-            subject: "Order Details",
-            // text: emailContent, // will use if html does not work
-            html: emailContent
-        });
-
-        await email.send().then();
-
-        // prisma.table_name.operation
-        await prisma.order_data.create({
-            data: {
-                access_code: body.accessCode,
-                email_recipients: body.email,
-                order_date: new Date(body.deliveryDate),
-                location: body.location,
-                order_data: JSON.stringify(body.items),
-                file_name: "order_data.csv",
-                file_size: null,
-                file_type: null,
-                file_content: null
-            }
-        });
-
-        return success(`Email has been sent to ${body.accessCode} and stored in database`);
-
-    } catch (e) {
-        return internalServerError(`An error occurred while trying to send email: ${e}`);
+export class StockEmailSender implements RequestHandler {
+    async handle(req: Request): Promise<CustomResponse> {
+        return this.handleSendEmail(req);
     }
+
+    async auth(req: Request): Promise<CustomResponse> {
+        return handleAuth(req);
+    }
+
+    async handleSendEmail(req: Request): Promise<CustomResponse> {
+        try {
+            const body: OrderDetails = await req.json();
+            const emailContent = generateEmailBody(body);
+            const csvFile = generateCsvFromItems(body);
+
+            let email = new Email({
+                to: body.email,
+                subject: "Order Details",
+                // text: emailContent, // will use if html does not work
+                html: emailContent
+            });
+
+            if (csvFile.length > 0) {
+                email = email.attach({
+                    filename: "order_data.csv",
+                    content: csvFile
+                })
+            }
+
+            await email.send().then();
+
+            // prisma.table_name.operation
+            await prisma.order_data.create({
+                data: {
+                    access_code: body.accessCode,
+                    email_recipients: body.email,
+                    order_date: new Date(body.deliveryDate),
+                    location: body.location,
+                    order_data: JSON.stringify(body.items),
+                    file_name: "order_data.csv",
+                    file_size: null,
+                    file_type: null,
+                    file_content: null
+                }
+            });
+
+            return success(`Email has been sent to ${body.accessCode} and stored in database`);
+
+        } catch (e) {
+            return internalServerError(`An error occurred while trying to send email: ${e}`);
+        }
+    }
+
 }
 
 function generateEmailBody(data: OrderDetails): string {
