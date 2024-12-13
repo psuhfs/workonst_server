@@ -1,7 +1,7 @@
 import {createObjectCsvStringifier} from "csv-writer";
 import {type OrderDetails} from "../../handler/utils.ts";
 
-export async function generateCsvFromItems(orderDetails: OrderDetails): string {
+export function generateCsvFromItems(orderDetails: OrderDetails): string {
     try {
         if (!orderDetails.items || orderDetails.items.length === 0) {
             console.error("No items to write to CSV.");
