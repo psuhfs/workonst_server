@@ -3,10 +3,6 @@ import type {CustomResponse} from "../../http/response.ts";
 import type {RequestHandler} from "../../http/traits.ts";
 import {handleAuth} from "../../auth/handler.ts";
 
-class Foo {
-    private foo: string = "Biscotti" | "Outpost";
-}
-
 export class GetItems implements RequestHandler {
     async handle(req: Request): Promise<CustomResponse> {
         return this.handleGetItems(req);
