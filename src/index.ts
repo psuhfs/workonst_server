@@ -15,6 +15,16 @@ if (dcWebhook === undefined) {
     const server = Bun.serve({
         port: 3000,
         async fetch(request): Promise<Response> {
+            if (request.method === "OPTIONS") {
+                return new Response(null, {
+                  headers: {
+                    "Access-Control-Allow-Origin": "*",  // or specify your allowed origin, e.g., 'http://localhost:5000'
+                    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+                    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+                    "Access-Control-Max-Age": "86400", // Cache preflight response for 1 day
+                  },
+                });
+              }
             // done: Points email, (jisko mile h usko email), push all data to SQL
             // html me meal coupon violation
             // db edit
@@ -30,4 +40,3 @@ if (dcWebhook === undefined) {
 
     console.log(`Listening on http://localhost:${server.port}`);
 }
-

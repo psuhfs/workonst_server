@@ -26,6 +26,15 @@ export class Email implements Sendable {
         this.emailOptions = emailOptions;
     }
 
+    attach(file: File): this {
+        if (!this.emailOptions.attachments) {
+            this.emailOptions.attachments = [file];
+        }else {
+            this.emailOptions.attachments.push(file);
+        }
+        return this;
+    }
+
     async send(): Promise<void | Error> {
         try {
             // Create a transporter with your email service credentials

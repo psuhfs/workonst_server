@@ -1,10 +1,23 @@
 import {internalServerError, success} from "../../http/responseTemplates.ts";
 import type {CustomResponse} from "../../http/response.ts";
+import type {RequestHandler} from "../../http/traits.ts";
+import {handleAuth} from "../../auth/handler.ts";
 
-export async function handleGetItems(_: Request): Promise<CustomResponse> {
-    try {
-        return success("getting items..."); // placeholder
-    } catch (e) {
-        return internalServerError(`An error occurred while trying to get items: ${e}`);
+export class GetItems implements RequestHandler {
+    async handle(req: Request): Promise<CustomResponse> {
+        return this.handleGetItems(req);
+    }
+
+    async auth(req: Request): Promise<CustomResponse> {
+        return handleAuth(req);
+    }
+
+    async handleGetItems(req: Request): Promise<CustomResponse> {
+        try {
+            // TODO: impl
+            return success("TODO");
+        } catch (e) {
+            return internalServerError(`An error occurred while trying to get items: ${e}`);
+        }
     }
 }

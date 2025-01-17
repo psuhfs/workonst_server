@@ -138,3 +138,10 @@ model sub_test {
 
   @@ignore
 }
+
+model crew_leaders {
+  username   String    @id @db.VarChar(255)
+  emailid    String    @db.VarChar(255)
+  created_at DateTime? @default(now()) @db.Timestamp(0)
+  password   String    @db.VarChar(255)
+}

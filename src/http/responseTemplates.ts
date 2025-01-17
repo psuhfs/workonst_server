@@ -5,7 +5,7 @@ export function notFound(message: string = "not found"): CustomResponse {
     const body = JSON.stringify({error: "Not Found", message});
     return new CustomResponse(new Response(body, {
         status: 404,
-        headers: {"Content-Type": "application/json"}
+        headers: {"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"}
     }), new CustomError(new Error(body)));
 }
 
@@ -13,7 +13,7 @@ export function methodNotAllowed(message: string = "Method not allowed"): Custom
     const body = JSON.stringify({error: "Method Not Allowed", message});
     return new CustomResponse(new Response(body, {
         status: 405,
-        headers: {"Content-Type": "application/json"}
+        headers: {"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"}
     }), new CustomError(new Error(body)));
 }
 
@@ -21,7 +21,7 @@ export function invalidRequest(req: Request, message: string = "Invalid request"
     const body = JSON.stringify({error: "Bad Request", message, url: req.url});
     return new CustomResponse(new Response(body, {
         status: 405,
-        headers: {"Content-Type": "application/json"}
+        headers: {"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"}
     }), new CustomError(new Error(body)));
 }
 
@@ -29,7 +29,7 @@ export function unauthorized(message: string = "Unauthorized access"): CustomRes
     const body = JSON.stringify({error: "Unauthorized", message});
     return new CustomResponse(new Response(body, {
         status: 401,
-        headers: {"Content-Type": "application/json"}
+        headers: {"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"}
     }), new CustomError(new Error(body)));
 }
 
@@ -37,7 +37,7 @@ export function forbidden(message: string = "Forbidden access"): CustomResponse 
     const body = JSON.stringify({error: "Forbidden", message});
     return new CustomResponse(new Response(body, {
         status: 403,
-        headers: {"Content-Type": "application/json"}
+        headers: {"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"}
     }), new CustomError(new Error(body)));
 }
 
@@ -47,13 +47,13 @@ export function internalServerError(message: string = "Internal server error", c
 
     return new CustomResponse(new Response(body, {
         status: 500,
-        headers: {"Content-Type": "application/json"}
+        headers: {"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"}
     }), new CustomError(new Error(errBody)));
 }
 
 export function success(data: any): CustomResponse {
     return new CustomResponse(new Response(JSON.stringify(data), {
         status: 200,
-        headers: {"Content-Type": "application/json"}
+        headers: {"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"}
     }));
 }
