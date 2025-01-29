@@ -39,4 +39,5 @@ USER bun
 EXPOSE 3000
 
 # Run your app
+CMD ["prisma", "generate"]
 CMD ["bun", "run", "src/index.ts"]
