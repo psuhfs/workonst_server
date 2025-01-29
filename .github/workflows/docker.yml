@@ -72,9 +72,3 @@ jobs:
       - name: Push Docker image
         run: |
           docker push ivybonbon/stockon:${{ github.sha }}
-      
-      # Optionally, push to GitHub Container Registry (GHCR)
-      - name: Push to GHCR
-        run: |
-          docker tag stockon:${{ github.sha }} ghcr.io/${{ github.repository }}/stockon:${{ github.sha }}
-          docker push ghcr.io/${{ github.repository }}/stockon:${{ github.sha }}
