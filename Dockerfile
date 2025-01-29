@@ -11,6 +11,8 @@ COPY . /app
 
 # Install dependencies using Bun
 RUN bun install
+RUN bun add prisma typescript tsx @types/node --dev
+RUN bun prisma generate
 
 # Build arguments from GitHub Secrets (passed during build)
 ARG DATABASE_URL
@@ -39,5 +41,4 @@ USER bun
 EXPOSE 3000
 
 # Run your app
-CMD ["prisma", "generate"]
 CMD ["bun", "run", "src/index.ts"]
