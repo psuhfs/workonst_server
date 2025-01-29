@@ -39,20 +39,30 @@ jobs:
       
       # Build the Docker image and inject GitHub Secrets as environment variables
       - name: Build Docker image with secrets
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          WEBHOOK: ${{ secrets.WEBHOOK }}
+          BASE_URL: ${{ secrets.BASE_URL }}
+          GETALL_URL: ${{ secrets.GETALL_URL }}
+          SHIFTS_URL: ${{ secrets.SHIFTS_URL }}
+          MANAGER: ${{ secrets.MANAGER }}
+          EMAIL: ${{ secrets.EMAIL }}
+          PASS: ${{ secrets.PASS }}
+          JWT: ${{ secrets.JWT }}
         run: |
           docker build \
-            --build-arg DATABASE_URL=${{ secrets.DATABASE_URL }} \
-            --build-arg WEBHOOK=${{ secrets.WEBHOOK }} \
-            --build-arg BASE_URL=${{ secrets.BASE_URL }} \
-            --build-arg GETALL_URL=${{ secrets.GETALL_URL }} \
-            --build-arg SHIFTS_URL=${{ secrets.SHIFTS_URL }} \
-            --build-arg MANAGER=${{ secrets.MANAGER }} \
-            --build-arg EMAIL=${{ secrets.EMAIL }} \
-            --build-arg PASS=${{ secrets.PASS }} \
-            --build-arg JWT=${{ secrets.JWT }} \
+            --build-arg DATABASE_URL="$DATABASE_URL" \
+            --build-arg WEBHOOK="$WEBHOOK" \
+            --build-arg BASE_URL="$BASE_URL" \
+            --build-arg GETALL_URL="$GETALL_URL" \
+            --build-arg SHIFTS_URL="$SHIFTS_URL" \
+            --build-arg MANAGER="$MANAGER" \
+            --build-arg EMAIL="$EMAIL" \
+            --build-arg PASS="$PASS" \
+            --build-arg JWT="$JWT" \
             --tag stockon:${{ github.sha }} \
             .
-      
+
       # Tag the image for pushing to the registry
       - name: Tag Docker image
         run: |
