@@ -110,7 +110,7 @@ export class Router {
 
         const methodRoutes = this.routes.get(method);
         if (!methodRoutes) {
-            return methodNotAllowed(`Method ${method} not allowed`);
+            return null;
         }
 
         const handler = methodRoutes.get(path);

@@ -1,0 +1,74 @@
+name: Build Docker Image
+
+on:
+  push:
+    branches:
+      - main  # Trigger when code is pushed to the main branch
+  pull_request:
+    branches:
+      - main  # Trigger on PRs targeting the main branch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      # Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      # Set up Docker Buildx (needed for building multi-platform images)
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      
+      # Cache Docker layers to speed up builds
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+      
+      # Log in to Docker Hub using the Docker token
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}  # Docker Hub username from GitHub Secrets
+          password: ${{ secrets.DOCKER_TOKEN }}     # Docker access token from GitHub Secrets
+      
+      # Build the Docker image and inject GitHub Secrets as environment variables
+      - name: Build Docker image with secrets
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          WEBHOOK: ${{ secrets.WEBHOOK }}
+          BASE_URL: ${{ secrets.BASE_URL }}
+          GETALL_URL: ${{ secrets.GETALL_URL }}
+          SHIFTS_URL: ${{ secrets.SHIFTS_URL }}
+          MANAGER: ${{ secrets.MANAGER }}
+          EMAIL: ${{ secrets.EMAIL }}
+          PASS: ${{ secrets.PASS }}
+          JWT: ${{ secrets.JWT }}
+        run: |
+          docker build \
+            --build-arg DATABASE_URL="$DATABASE_URL" \
+            --build-arg WEBHOOK="$WEBHOOK" \
+            --build-arg BASE_URL="$BASE_URL" \
+            --build-arg GETALL_URL="$GETALL_URL" \
+            --build-arg SHIFTS_URL="$SHIFTS_URL" \
+            --build-arg MANAGER="$MANAGER" \
+            --build-arg EMAIL="$EMAIL" \
+            --build-arg PASS="$PASS" \
+            --build-arg JWT="$JWT" \
+            --tag stockon:${{ github.sha }} \
+            .
+
+      # Tag the image for pushing to the registry
+      - name: Tag Docker image
+        run: |
+          docker tag stockon:${{ github.sha }} ivybonbon/stockon:${{ github.sha }}
+      
+      # Push the Docker image to Docker Hub (or GHCR)
+      - name: Push Docker image
+        run: |
+          docker push ivybonbon/stockon:${{ github.sha }}

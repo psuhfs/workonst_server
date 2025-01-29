@@ -1,0 +1,23 @@
+services:
+  stockon:
+    container_name: stockon-container
+    image: ivybonbon/stockon:cc06c5247a08335eec3a8de294450478b67eada0
+    restart: always  # Ensures the container restarts on failure
+    ports:
+      - "3000:3000"  # Map the container port 3000 to local machine port 3000
+#    environment:
+#      DATABASE_URL: "${DATABASE_URL}"
+#      WEBHOOK: "${WEBHOOK}"
+#      BASE_URL: "${BASE_URL}"
+#      GETALL_URL: "${GETALL_URL}"
+#      SHIFTS_URL: "${SHIFTS_URL}"
+#      MANAGER: "${MANAGER}"
+#      EMAIL: "${EMAIL}"
+#      PASS: "${PASS}"
+#      JWT: "${JWT}"
+    networks:
+      - stockon-network
+
+networks:
+  stockon-network:
+    driver: bridge
