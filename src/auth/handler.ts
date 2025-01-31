@@ -2,6 +2,7 @@ import type { CustomResponse } from "../http/response.ts";
 import {
   internalServerError,
   success,
+  successHeaders,
   unauthorized,
 } from "../http/responseTemplates.ts";
 import jwt from "jsonwebtoken";
@@ -26,7 +27,7 @@ export async function handleAuth(req: Request): Promise<CustomResponse> {
   try {
     let token = req.headers.get("Authorization");
     if (token === null) {
-      return unauthorized("No token provided.");
+      return unauthorized("No Authorization token provided.");
     }
     token = token.replace("Bearer ", "");
     return await processAuth({ token });
@@ -109,7 +110,11 @@ async function processAuthSignin(body: AuthModel): Promise<CustomResponse> {
     return unauthorized("Invalid username or password.");
   }
 
-  return success(genToken(body));
+  const token = genToken(body);
+
+  return successHeaders(token, {
+    "Set-Cookie": `auth_token=${token.token}; HttpOnly; Secure; SameSite=Strict; Max-Age=36000`,
+  });
 }
 
 async function processAuthSignup(body: AuthModel): Promise<CustomResponse> {

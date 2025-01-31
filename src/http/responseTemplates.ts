@@ -110,3 +110,19 @@ export function success(data: any): CustomResponse {
     }),
   );
 }
+
+export function successHeaders(
+  data: any,
+  appendHeaders: Record<string, string>,
+): CustomResponse {
+  return new CustomResponse(
+    new Response(JSON.stringify(data), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        ...appendHeaders,
+      },
+    }),
+  );
+}

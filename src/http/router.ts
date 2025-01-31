@@ -1,10 +1,5 @@
 import { fromString, type RequestType } from "./requestType.ts";
-import {
-  invalidRequest,
-  methodNotAllowed,
-  notFound,
-  success,
-} from "./responseTemplates.ts";
+import { invalidRequest, notFound, success } from "./responseTemplates.ts";
 import { CustomResponse } from "./response.ts";
 import type { RequestHandler } from "./traits.ts";
 
