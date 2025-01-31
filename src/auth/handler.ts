@@ -40,8 +40,10 @@ export async function handleAuth(req: Request): Promise<CustomResponse> {
                 return unauthorized("No token provided.");
             }
             token = extractTokenFromCookie(cookie);
+        } else {
+            token = token.replace("Bearer ", "");
         }
-        token = token.replace("Bearer ", "");
+        console.log(token);
         return await processAuth({token});
     } catch (e: any) {
         return internalServerError("Unable to process auth request.", e.toString());
