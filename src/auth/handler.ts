@@ -24,6 +24,8 @@ interface AuthModel {
 
 // TODO: should maintain a map
 export async function handleAuth(req: Request): Promise<CustomResponse> {
+    let token = await req.json();
+    console.log(token);
     function extractTokenFromCookie(cookie: string) {
         let token = cookie.split(";").find((c) => c.includes("token"));
         if (token === undefined) {
@@ -51,7 +53,7 @@ export async function handleAuth(req: Request): Promise<CustomResponse> {
         if (!authResp.getResponse().ok) {
             return authResp;
         }
-        return successHeaders({message: "Auth Successful."}, {"Access-Control-Allow-Origin": "https://hfs.ssdd.dev"});
+        return successHeaders({message: "Auth Successful."}, {"Access-Control-Allow-Origin": `${req.headers.get("Origin")}`});
     } catch (e: any) {
         return internalServerError("Unable to process auth request.", e.toString());
     }
@@ -89,9 +91,8 @@ export class IsAuthenticatedHandler implements RequestHandler {
         _params: Record<string, string>,
     ): Promise<CustomResponse> {
         let resp = await handleAuth(req);
-        // let origin = req.headers.get("Origin");
-        // origin = origin ? origin : "*";
-        let origin = "https://hfs.ssdd.dev";
+        let origin = req.headers.get("Origin");
+        origin = origin ? origin : "*";
         resp.getResponse().headers.set("access-control-allow-origin", origin);
         resp.getResponse().headers.set("Access-Control-Allow-Credentials", "true");
         console.log(resp.getResponse().headers);
@@ -155,11 +156,11 @@ async function processAuthSignin(body: AuthModel, origin: string | null): Promis
     const token = genToken(body);
     let headers = {
         "Set-Cookie": `token=${token.token}; Path=/; Secure; SameSite=Strict; Max-Age=36000`,
-        "Access-Control-Allow-Origin": "https://hfs.ssdd.dev",
+        "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Credentials": "true",
     };
     if (origin !== null) {
-        // headers["Access-Control-Allow-Origin"] = origin;
+        headers["Access-Control-Allow-Origin"] = origin;
     }
     console.log(headers);
 
