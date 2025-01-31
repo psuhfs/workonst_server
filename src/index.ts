@@ -13,7 +13,7 @@ let webhook = process.env.WEBHOOK
 await startBackgroundTask(webhook);
 
 const server = Bun.serve({
-  port: 3000,
+  port: process.env.PORT,
   async fetch(request): Promise<Response> {
     if (request.method === "OPTIONS") {
       return new Response(null, {
