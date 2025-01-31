@@ -51,7 +51,7 @@ export async function handleAuth(req: Request): Promise<CustomResponse> {
         if (!authResp.getResponse().ok) {
             return authResp;
         }
-        return successHeaders({message: "Auth Successful."}, {"Access-Control-Allow-Origin": `${req.headers.get("Origin")}`});
+        return successHeaders({message: "Auth Successful."}, {"Access-Control-Allow-Origin": "https://hfs.ssdd.dev"});
     } catch (e: any) {
         return internalServerError("Unable to process auth request.", e.toString());
     }
@@ -89,9 +89,9 @@ export class IsAuthenticatedHandler implements RequestHandler {
         _params: Record<string, string>,
     ): Promise<CustomResponse> {
         let resp = await handleAuth(req);
-        let origin = req.headers.get("Origin");
-        origin = origin ? origin : "*";
-        console.log("Origin: ", origin);
+        // let origin = req.headers.get("Origin");
+        // origin = origin ? origin : "*";
+        let origin = "https://hfs.ssdd.dev";
         resp.getResponse().headers.set("access-control-allow-origin", origin);
         resp.getResponse().headers.set("Access-Control-Allow-Credentials", "true");
         console.log(resp.getResponse().headers);
@@ -155,11 +155,11 @@ async function processAuthSignin(body: AuthModel, origin: string | null): Promis
     const token = genToken(body);
     let headers = {
         "Set-Cookie": `token=${token.token}; Path=/; Secure; SameSite=Strict; Max-Age=36000`,
-        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Origin": "https://hfs.ssdd.dev",
         "Access-Control-Allow-Credentials": "true",
     };
     if (origin !== null) {
-        headers["Access-Control-Allow-Origin"] = origin;
+        // headers["Access-Control-Allow-Origin"] = origin;
     }
     console.log(headers);
 
