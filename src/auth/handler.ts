@@ -154,8 +154,9 @@ async function processAuthSignin(body: AuthModel, origin: string | null): Promis
 
     const token = genToken(body);
     let headers = {
-        "Set-Cookie": `token=${token.token}; HttpOnly; Secure; SameSite=Strict; Max-Age=36000`,
+        "Set-Cookie": `token=${token.token}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=36000`,
         "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Credentials": "true",
     };
     if (origin !== null) {
         headers["Access-Control-Allow-Origin"] = origin;
