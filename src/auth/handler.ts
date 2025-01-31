@@ -39,11 +39,12 @@ export async function handleAuth(req: Request): Promise<CustomResponse> {
             if (cookie === null) {
                 return unauthorized("No token provided.");
             }
+            console.log("Cookie: ", cookie);
             token = extractTokenFromCookie(cookie);
         } else {
             token = token.replace("Bearer ", "");
         }
-        console.log(token);
+        console.log("token: ", token);
 
         let authResp = await processAuth({token});
         if (!authResp.getResponse().ok) {
