@@ -93,6 +93,7 @@ export class IsAuthenticatedHandler implements RequestHandler {
         origin = origin ? origin : "*";
         console.log("Origin: ", origin);
         resp.getResponse().headers.set("access-control-allow-origin", origin);
+        resp.getResponse().headers.set("Access-Control-Allow-Credentials", "true");
         console.log(resp.getResponse().headers);
         return resp;
     }
