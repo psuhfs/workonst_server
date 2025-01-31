@@ -22,6 +22,7 @@ const server = Bun.serve({
           "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
           "Access-Control-Allow-Headers": "Content-Type, Authorization",
           "Access-Control-Max-Age": "86400", // Cache preflight response for 1 day
+          "Access-Control-Allow-Credentials": "true",
         },
       });
     }
