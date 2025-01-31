@@ -91,7 +91,8 @@ export class IsAuthenticatedHandler implements RequestHandler {
         let resp = await handleAuth(req);
         let origin = req.headers.get("Origin");
         origin = origin ? origin : "*";
-        resp.getResponse().headers["Access-Control-Allow-Origin"] = origin;
+        console.log("Origin: ", origin);
+        resp.getResponse().headers.set("access-control-allow-origin", origin);
         console.log(resp.getResponse().headers);
         return resp;
     }
