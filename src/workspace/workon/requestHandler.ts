@@ -1,7 +1,7 @@
 import { Router } from "../../http/router.ts";
 import { RequestType } from "../../http/requestType.ts";
 import { GetEmployee, GetEmployees } from "./getHandlers.ts";
-import { IncrHandler, ShiftHandler, ShiftsHandler } from "./postHandlers.ts";
+import {GetPointsHandler, IncrHandler, ShiftHandler, ShiftsHandler} from "./postHandlers.ts";
 
 const router = new Router("/workon");
 
@@ -23,7 +23,10 @@ router
   })
   .add(RequestType.POST, "/employee/:id/shifts", new ShiftHandler(), {
     description: "Caches and returns list all shifts of the given employee",
-  });
+  })
+    .add(RequestType.GET, "/points", new GetPointsHandler(), {
+        description: "Caches and returns list of all points.",
+    });
 
 export default {
   handle: async (req: Request) => {

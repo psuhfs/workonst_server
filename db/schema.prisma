@@ -96,7 +96,7 @@ model Test_Points {
   accessCode    String?   @db.VarChar(255)
   employeeName  String?   @db.VarChar(255)
   employeeId    Int?
-  shiftDate     DateTime? @db.Date
+  shiftDate     String? @db.Text
   selectedShift String?   @db.VarChar(255)
   manualShift   String?   @db.VarChar(255)
   reason        String?   @db.Text
