@@ -44,7 +44,12 @@ export async function handleAuth(req: Request): Promise<CustomResponse> {
             token = token.replace("Bearer ", "");
         }
         console.log(token);
-        return await processAuth({token});
+
+        let authResp = await processAuth({token});
+        if (!authResp.getResponse().ok) {
+            return authResp;
+        }
+        return successHeaders({message: "Auth Successful."}, {"Access-Control-Allow-Origin": `${req.headers.get("Origin")}`});
     } catch (e: any) {
         return internalServerError("Unable to process auth request.", e.toString());
     }

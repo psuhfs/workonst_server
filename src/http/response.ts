@@ -10,6 +10,10 @@ export class CustomResponse {
     this.err = error;
   }
 
+  public getResponse(): Response {
+    return this.response;
+  }
+
   public async intoResponse(webhook: Webhook) {
     await webhook.send(this.err);
     return this.response;
