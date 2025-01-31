@@ -61,6 +61,19 @@ export class SignUpHandler implements RequestHandler {
   }
 }
 
+export class IsAuthenticatedHandler implements RequestHandler {
+  async handle(
+    req: Request,
+    _params: Record<string, string>,
+  ): Promise<CustomResponse> {
+    return handleAuth(req);
+  }
+
+  async auth(_: Request): Promise<CustomResponse> {
+    return success("Blah");
+  }
+}
+
 export class SignInHandler implements RequestHandler {
   async handle(
     req: Request,
