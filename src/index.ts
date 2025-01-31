@@ -20,7 +20,7 @@ const server = Bun.serve({
         headers: {
           "Access-Control-Allow-Origin": `${request.headers.get("Origin")}`, // or specify your allowed origin, e.g., 'http://localhost:5000'
           "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-          "Access-Control-Allow-Headers": "Content-Type, Authorization",
+          "Access-Control-Allow-Headers": "Content-Type, Authorization, Cookie",
           "Access-Control-Max-Age": "86400", // Cache preflight response for 1 day
           "Access-Control-Allow-Credentials": "true",
         },
