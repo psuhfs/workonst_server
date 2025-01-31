@@ -52,8 +52,8 @@ export async function handleAuth(req: Request): Promise<CustomResponse> {
             let origin = req.headers.get("Origin");
             origin = origin ? origin : "*";
             console.log(origin);
-            authResp.getResponse().headers.set("Access-Control-Allow-Origin", origin);
-            console.log("Headers: ", authResp.getResponse().headers);g
+            authResp.getResponse().headers["Access-Control-Allow-Origin"] = origin;
+            console.log("Headers: ", authResp.getResponse().headers);
             return authResp;
         }
         return successHeaders({message: "Auth Successful."}, {"Access-Control-Allow-Origin": `${req.headers.get("Origin")}`});
