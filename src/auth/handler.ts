@@ -24,9 +24,6 @@ interface AuthModel {
 
 // TODO: should maintain a map
 export async function handleAuth(req: Request): Promise<CustomResponse> {
-    let token = await req.json();
-    console.log(token);
-
     function extractTokenFromCookie(cookie: string) {
         let token = cookie.split(";").find((c) => c.includes("token"));
         if (token === undefined) {
@@ -36,21 +33,21 @@ export async function handleAuth(req: Request): Promise<CustomResponse> {
     }
 
     try {
-        // let token = req.headers.get("Authorization");
-        // if (token === null) {
-        //     console.log(req);
-        //     let cookie = req.headers.get("cookie");
-        //     if (cookie === null) {
-        //         return unauthorized("No token provided.");
-        //     }
-        //     console.log("Cookie: ", cookie);
-        //     token = extractTokenFromCookie(cookie);
-        // } else {
-        //     token = token.replace("Bearer ", "");
-        // }
-        // console.log("token: ", token);
+        let token = req.headers.get("Authorization");
+        if (token === null) {
+            console.log(req);
+            let cookie = req.headers.get("cookie");
+            if (cookie === null) {
+                return unauthorized("No token provided.");
+            }
+            console.log("Cookie: ", cookie);
+            token = extractTokenFromCookie(cookie);
+        } else {
+            token = token.replace("Bearer ", "");
+        }
+        console.log("token: ", token);
 
-        let authResp = await processAuth({token});
+        let authResp = await processAuth(token? {token} : {token: ""});
         if (!authResp.getResponse().ok) {
             return authResp;
         }
@@ -96,7 +93,6 @@ export class IsAuthenticatedHandler implements RequestHandler {
         origin = origin ? origin : "*";
         resp.getResponse().headers.set("access-control-allow-origin", origin);
         resp.getResponse().headers.set("Access-Control-Allow-Credentials", "true");
-        console.log(resp.getResponse().headers);
         return resp;
     }
 
@@ -156,15 +152,13 @@ async function processAuthSignin(body: AuthModel, origin: string | null): Promis
 
     const token = genToken(body);
     let headers = {
-        "Set-Cookie": `token=${token.token}; Path=/; Secure; SameSite=Strict; Max-Age=36000`,
+        "Set-Cookie": `token=${token.token}; Path=/; SameSite=None; Max-Age=36000`,
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Credentials": "true",
     };
     if (origin !== null) {
         headers["Access-Control-Allow-Origin"] = origin;
     }
-    console.log(headers);
-
     return successHeaders(token, headers);
 }
 
@@ -204,12 +198,13 @@ async function processAuthSignup(body: AuthModel): Promise<CustomResponse> {
 }
 
 function genToken(body: AuthModel): Token {
+    let token = jwt.sign(
+        {pw: body.password, username: body.username},
+        process.env.JWT,
+        {expiresIn: "10h"},
+    );
     return {
-        token: jwt.sign(
-            {pw: body.password, username: body.username},
-            process.env.JWT,
-            {expiresIn: "10h"},
-        ),
+        token,
     };
 }
 
