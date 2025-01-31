@@ -51,7 +51,8 @@ export async function handleAuth(req: Request): Promise<CustomResponse> {
 export async function handleAuthSignin(req: Request): Promise<CustomResponse> {
     try {
         let body: AuthModel = await req.json();
-        return await processAuthSignin(body);
+        let origin = req.headers.get("Origin");
+        return await processAuthSignin(body, origin);
     } catch (e: any) {
         return internalServerError(
             "Unable to process auth signin request.",
@@ -121,7 +122,7 @@ async function processAuth(body: Token): Promise<CustomResponse> {
     }
 }
 
-async function processAuthSignin(body: AuthModel): Promise<CustomResponse> {
+async function processAuthSignin(body: AuthModel, origin: string | null): Promise<CustomResponse> {
     body.password = sha256Hash(body.password);
 
     let val = await prisma.crew_leaders.findUnique({
@@ -136,10 +137,16 @@ async function processAuthSignin(body: AuthModel): Promise<CustomResponse> {
     }
 
     const token = genToken(body);
-
-    return successHeaders(token, {
+    let headers = {
         "Set-Cookie": `token=${token.token}; HttpOnly; Secure; SameSite=Strict; Max-Age=36000`,
-    });
+        "Access-Control-Allow-Origin": "https://hfs.ssdd.dev",
+    };
+    if (origin !== null) {
+        headers["Access-Control-Allow-Origin"] = `${headers["Access-Control-Allow-Origin"]}, ${origin}`;
+    }
+    console.log(headers);
+
+    return successHeaders(token, headers);
 }
 
 async function processAuthSignup(body: AuthModel): Promise<CustomResponse> {
