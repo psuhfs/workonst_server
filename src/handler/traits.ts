@@ -1,3 +1,3 @@
 export interface Sendable {
-    send(): Promise<void | Error>;
+  send(): Promise<void | Error>;
 }

@@ -1,5 +1,5 @@
-import type {CustomError} from "../errors/error.ts";
+import type { CustomError } from "../errors/error.ts";
 
 export interface Webhook {
-    send: (error: CustomError | undefined) => Promise<void>;
+  send: (error: CustomError | undefined) => Promise<void>;
 }
