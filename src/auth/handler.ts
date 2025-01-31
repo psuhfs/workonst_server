@@ -26,6 +26,7 @@ interface AuthModel {
 export async function handleAuth(req: Request): Promise<CustomResponse> {
     let token = await req.json();
     console.log(token);
+
     function extractTokenFromCookie(cookie: string) {
         let token = cookie.split(";").find((c) => c.includes("token"));
         if (token === undefined) {
@@ -35,19 +36,19 @@ export async function handleAuth(req: Request): Promise<CustomResponse> {
     }
 
     try {
-        let token = req.headers.get("Authorization");
-        if (token === null) {
-            console.log(req);
-            let cookie = req.headers.get("cookie");
-            if (cookie === null) {
-                return unauthorized("No token provided.");
-            }
-            console.log("Cookie: ", cookie);
-            token = extractTokenFromCookie(cookie);
-        } else {
-            token = token.replace("Bearer ", "");
-        }
-        console.log("token: ", token);
+        // let token = req.headers.get("Authorization");
+        // if (token === null) {
+        //     console.log(req);
+        //     let cookie = req.headers.get("cookie");
+        //     if (cookie === null) {
+        //         return unauthorized("No token provided.");
+        //     }
+        //     console.log("Cookie: ", cookie);
+        //     token = extractTokenFromCookie(cookie);
+        // } else {
+        //     token = token.replace("Bearer ", "");
+        // }
+        // console.log("token: ", token);
 
         let authResp = await processAuth({token});
         if (!authResp.getResponse().ok) {
