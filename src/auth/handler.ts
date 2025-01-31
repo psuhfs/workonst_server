@@ -38,7 +38,11 @@ export async function handleAuth(req: Request): Promise<CustomResponse> {
             console.log(req);
             let cookie = req.headers.get("cookie");
             if (cookie === null) {
-                return unauthorized("No token provided.");
+                let resp = unauthorized("No token provided.");
+                let origin = req.headers.get("Origin");
+                origin = origin ? origin : "*";
+                resp.getResponse().headers["Access-Control-Allow-Origin"] = origin;
+                return resp;
             }
             console.log("Cookie: ", cookie);
             token = extractTokenFromCookie(cookie);
