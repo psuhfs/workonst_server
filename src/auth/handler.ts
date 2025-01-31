@@ -142,7 +142,7 @@ async function processAuthSignin(body: AuthModel, origin: string | null): Promis
         "Access-Control-Allow-Origin": "*",
     };
     if (origin !== null) {
-        headers["Access-Control-Allow-Origin"] = `${headers["Access-Control-Allow-Origin"]}, ${origin}`;
+        headers["Access-Control-Allow-Origin"] = origin;
     }
     console.log(headers);
 
