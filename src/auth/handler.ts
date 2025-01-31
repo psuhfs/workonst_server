@@ -35,6 +35,7 @@ export async function handleAuth(req: Request): Promise<CustomResponse> {
     try {
         let token = req.headers.get("Authorization");
         if (token === null) {
+            console.log(req);
             let cookie = req.headers.get("cookie");
             if (cookie === null) {
                 return unauthorized("No token provided.");
