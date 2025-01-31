@@ -113,7 +113,7 @@ async function processAuthSignin(body: AuthModel): Promise<CustomResponse> {
   const token = genToken(body);
 
   return successHeaders(token, {
-    "Set-Cookie": `auth_token=${token.token}; HttpOnly; Secure; SameSite=Strict; Max-Age=36000`,
+    "Set-Cookie": `token=${token.token}; HttpOnly; Secure; SameSite=Strict; Max-Age=36000`,
   });
 }
 
