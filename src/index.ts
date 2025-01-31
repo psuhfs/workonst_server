@@ -18,7 +18,7 @@ const server = Bun.serve({
     if (request.method === "OPTIONS") {
       return new Response(null, {
         headers: {
-          "Access-Control-Allow-Origin": "*", // or specify your allowed origin, e.g., 'http://localhost:5000'
+          "Access-Control-Allow-Origin": `https://hfs.ssdd.dev, ${request.headers.get("Origin")}`, // or specify your allowed origin, e.g., 'http://localhost:5000'
           "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
           "Access-Control-Allow-Headers": "Content-Type, Authorization",
           "Access-Control-Max-Age": "86400", // Cache preflight response for 1 day
