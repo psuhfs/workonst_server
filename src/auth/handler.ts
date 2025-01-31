@@ -38,11 +38,7 @@ export async function handleAuth(req: Request): Promise<CustomResponse> {
             console.log(req);
             let cookie = req.headers.get("cookie");
             if (cookie === null) {
-                let resp = unauthorized("No token provided.");
-                let origin = req.headers.get("Origin");
-                origin = origin ? origin : "*";
-                resp.getResponse().headers["Access-Control-Allow-Origin"] = origin;
-                return resp;
+                return unauthorized("No token provided.");
             }
             console.log("Cookie: ", cookie);
             token = extractTokenFromCookie(cookie);
@@ -53,11 +49,6 @@ export async function handleAuth(req: Request): Promise<CustomResponse> {
 
         let authResp = await processAuth({token});
         if (!authResp.getResponse().ok) {
-            let origin = req.headers.get("Origin");
-            origin = origin ? origin : "*";
-            console.log(origin);
-            authResp.getResponse().headers["Access-Control-Allow-Origin"] = origin;
-            console.log("Headers: ", authResp.getResponse().headers);
             return authResp;
         }
         return successHeaders({message: "Auth Successful."}, {"Access-Control-Allow-Origin": `${req.headers.get("Origin")}`});
@@ -97,7 +88,12 @@ export class IsAuthenticatedHandler implements RequestHandler {
         req: Request,
         _params: Record<string, string>,
     ): Promise<CustomResponse> {
-        return handleAuth(req);
+        let resp = await handleAuth(req);
+        let origin = req.headers.get("Origin");
+        origin = origin ? origin : "*";
+        resp.getResponse().headers["Access-Control-Allow-Origin"] = origin;
+        console.log(resp.getResponse().headers);
+        return resp;
     }
 
     async auth(_: Request): Promise<CustomResponse> {
