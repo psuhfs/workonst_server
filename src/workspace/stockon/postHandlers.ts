@@ -57,6 +57,7 @@ export class StockEmailSender implements RequestHandler {
 
       return success(
         `Email has been sent to ${body.accessCode} and stored in database`,
+          req.headers.get("Origin"),
       );
     } catch (e) {
       return internalServerError(

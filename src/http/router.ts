@@ -25,8 +25,8 @@ class MatchesHandler implements RequestHandler {
     return this.handler(req, params);
   }
 
-  async auth(_: Request): Promise<CustomResponse> {
-    return success("Blah");
+  async auth(req: Request): Promise<CustomResponse> {
+    return success("Blah", req.headers.get("Origin"));
   }
 }
 
@@ -133,7 +133,7 @@ export class Router {
     if (!methodRoutes) {
       return null;
     }
-
+/*
     const handler = methodRoutes.get(path);
     if (handler) {
       let auth = await handler.auth(req);
@@ -141,7 +141,7 @@ export class Router {
         return auth;
       }
       return handler.handle(req, {});
-    }
+    }*/
 
     // Optional: Fuzzy matching for dynamic routes
     for (const [route, handler] of methodRoutes) {
@@ -152,6 +152,8 @@ export class Router {
           return auth;
         }
         return handler.handle(req, match);
+      }else {
+        console.log("No match for", path, route);
       }
     }
 

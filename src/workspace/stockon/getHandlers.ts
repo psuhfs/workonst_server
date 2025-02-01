@@ -15,7 +15,7 @@ export class GetItems implements RequestHandler {
   async handleGetItems(req: Request): Promise<CustomResponse> {
     try {
       // TODO: impl
-      return success("TODO");
+      return success("TODO", req.headers.get("Origin"));
     } catch (e) {
       return internalServerError(
         `An error occurred while trying to get items: ${e}`,

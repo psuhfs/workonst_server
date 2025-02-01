@@ -47,7 +47,7 @@ export async function handleAuth(req: Request): Promise<CustomResponse> {
         }
         console.log("token: ", token);
 
-        let authResp = await processAuth(token? {token} : {token: ""});
+        let authResp = await processAuth(token ? {token} : {token: ""}, req.headers.get("Origin"));
         if (!authResp.getResponse().ok) {
             return authResp;
         }
@@ -78,8 +78,8 @@ export class SignUpHandler implements RequestHandler {
         return handleAuthSignup(req);
     }
 
-    async auth(_: Request): Promise<CustomResponse> {
-        return success("Blah");
+    async auth(req: Request): Promise<CustomResponse> {
+        return success("Blah", req.headers.get("Origin"));
     }
 }
 
@@ -96,8 +96,8 @@ export class IsAuthenticatedHandler implements RequestHandler {
         return resp;
     }
 
-    async auth(_: Request): Promise<CustomResponse> {
-        return success("Blah");
+    async auth(req: Request): Promise<CustomResponse> {
+        return success("Blah", req.headers.get("Origin"));
     }
 }
 
@@ -109,15 +109,15 @@ export class SignInHandler implements RequestHandler {
         return handleAuthSignin(req);
     }
 
-    async auth(_: Request): Promise<CustomResponse> {
-        return success("Blah");
+    async auth(req: Request): Promise<CustomResponse> {
+        return success("Blah", req.headers.get("Origin"));
     }
 }
 
 export async function handleAuthSignup(req: Request): Promise<CustomResponse> {
     try {
         let body: AuthModel = await req.json();
-        return await processAuthSignup(body);
+        return await processAuthSignup(body, req.headers.get("Origin"));
     } catch (e: any) {
         return internalServerError(
             "Unable to process auth signup request.",
@@ -126,11 +126,11 @@ export async function handleAuthSignup(req: Request): Promise<CustomResponse> {
     }
 }
 
-async function processAuth(body: Token): Promise<CustomResponse> {
+async function processAuth(body: Token, origin: string | null): Promise<CustomResponse> {
     if (verifyToken(body)) {
         return success({
             message: "Auth Successful.",
-        });
+        }, origin);
     } else {
         return unauthorized();
     }
@@ -162,7 +162,7 @@ async function processAuthSignin(body: AuthModel, origin: string | null): Promis
     return successHeaders(token, headers);
 }
 
-async function processAuthSignup(body: AuthModel): Promise<CustomResponse> {
+async function processAuthSignup(body: AuthModel, origin: string | null): Promise<CustomResponse> {
     if (body.signupDetails === undefined) {
         return unauthorized("No signup details provided.");
     }
@@ -194,7 +194,7 @@ async function processAuthSignup(body: AuthModel): Promise<CustomResponse> {
         },
     });
 
-    return success({message: "Signup successful."});
+    return success({message: "Signup successful."}, origin);
 }
 
 function genToken(body: AuthModel): Token {

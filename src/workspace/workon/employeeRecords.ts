@@ -72,15 +72,20 @@ function formatDate(dateString: string) {
 }
 
 export async function getShift(
-  url: string | undefined,
+  maybeUrl: string | undefined,
   date: string,
 ): Promise<ShiftList> {
-  if (!url) {
+  if (!maybeUrl) {
     throw "Url not defined";
   }
+  let url: string = maybeUrl;
 
   let formattedDate = formatDate(date);
-  url = url.replace("{{formattedDate}}", formattedDate);
+  // url = url.replace("{{formattedDate}}", formattedDate);
+  // JS/TS is being dick as always, and for some reason
+  // It DO NOT perform url.replace correctly.
+  // So I came up with this workaround. Please do not touch it.
+  url = url.split("{{formattedDate}}").join(formattedDate);
 
   const cacheKey = url;
   let cachedData: ShiftList | undefined = cache.get(cacheKey);

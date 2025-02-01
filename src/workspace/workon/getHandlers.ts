@@ -20,11 +20,11 @@ export class GetEmployees implements RequestHandler {
     return handleAuth(req);
   }
 
-  async handleGetEmployees(_: Request): Promise<CustomResponse> {
+  async handleGetEmployees(req: Request): Promise<CustomResponse> {
     try {
       let url = process.env.GETALL_URL;
       let value = await getEmployees(url);
-      return success(value);
+      return success(value, req.headers.get("Origin"));
     } catch (e) {
       return internalServerError(
         `An error occurred while trying to fetch employees: ${e}`,
@@ -46,7 +46,7 @@ export class GetEmployee {
   }
 
   async handleGetEmployee(
-    _: Request,
+    req: Request,
     params: Record<string, string>,
   ): Promise<CustomResponse> {
     try {
@@ -54,7 +54,7 @@ export class GetEmployee {
       let url = process.env.GETALL_URL;
       let value = await getEmployee(url, empNumber);
 
-      return success(value);
+      return success(value, req.headers.get("Origin"));
     } catch (e) {
       return internalServerError(
         `An error occurred while trying to fetch employee: ${e}`,

@@ -4,9 +4,7 @@ import { type PointsDetails } from "../../handler/utils.ts";
 import { Email } from "../../handler/email.ts";
 import {
   internalServerError,
-  invalidRequest,
   success,
-  unauthorized,
 } from "../../http/responseTemplates.ts";
 import { getShift } from "./employeeRecords.ts";
 import type { New_Table_Name } from "@prisma/client";
@@ -46,7 +44,6 @@ function generateEmailBody(data: PointsDetails): string {
 }
 
 export class IncrHandler implements RequestHandler {
-  private body: PointsDetails | null = null;
   async handle(
     req: Request,
     _params: Record<string, string>,
@@ -55,8 +52,9 @@ export class IncrHandler implements RequestHandler {
   }
 
   async auth(req: Request): Promise<CustomResponse> {
-    try {
-      let token = req.headers.get("Authorization");
+    return handleAuth(req);
+    /*try {
+      let token = req.headers.get("Cookie");
       if (!token) {
         return unauthorized("No token found in the request.");
       }
@@ -80,7 +78,7 @@ export class IncrHandler implements RequestHandler {
         e.toString(),
       );
     }
-    return success("Blah");
+    return success("Blah", req.headers.get("Origin"));*/
   }
 
   async handleIncr(req: Request): Promise<CustomResponse> {
@@ -94,12 +92,7 @@ export class IncrHandler implements RequestHandler {
           errors.push(e);
         }
       }
-
-      if (this.body === null) {
-        return invalidRequest(req, "No body found in request.");
-      }
-
-      let body: PointsDetails = this.body;
+      let body: PointsDetails = await req.json();
 
       new Db(prisma.new_Table_Name, body).send().then(populateErr);
       let email = {
@@ -123,7 +116,7 @@ export class IncrHandler implements RequestHandler {
         console.debug(pointD);
         return success({
           success: "Email sent and Points inserted in db.",
-        });
+        }, req.headers.get("Origin"));
       } else {
         return internalServerError(
           failureMsg,
@@ -163,11 +156,12 @@ export class ShiftsHandler implements RequestHandler {
 
   async handleShifts(req: Request): Promise<CustomResponse> {
     try {
-      let url = process.env.GETALL_URL;
+      let url = process.env.SHIFTS_URL;
+
       let body = await req.json();
       let value = await getShift(url, body["date"]);
 
-      return success(value);
+      return success(value, req.headers.get("Origin"));
     } catch (e) {
       return internalServerError(
         `An error occurred while trying to fetch shift(s): ${e}`,
@@ -194,15 +188,14 @@ export class ShiftHandler implements RequestHandler {
   ): Promise<CustomResponse> {
     try {
       const employeeId = parts["id"];
-      const url = process.env.GETALL_URL;
+      const url = process.env.SHIFTS_URL;
       let body = await req.json();
       let value = await getShift(url, body["date"]);
-      let shift = value.AssignedShiftList.find(
+      let shift = value.AssignedShiftList.filter(
         (v) => v.EMPLOYEE_NUMBER == employeeId,
       );
-      let resp = shift ? JSON.stringify(shift) : "{}";
 
-      return success(resp);
+      return success(shift, req.headers.get("Origin"));
     } catch (e) {
       return internalServerError(
         `An error occurred while trying to fetch shift(s): ${e}`,
