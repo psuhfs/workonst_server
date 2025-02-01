@@ -1,44 +1,23 @@
-# Use the official Bun image from GitHub Container Registry (GHCR)
-FROM oven/bun:1 AS base
+# Use the official Bun image
+FROM oven/bun:latest
 
-# Set working directory inside container
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copy the application files into the container
-#FROM base AS prerelease
-#COPY --from=install /temp/dev/node_modules node_modules
-COPY . /app
+# Copy package files first for better caching
+COPY bun.lockb package.json ./
 
-# Install dependencies using Bun
+# Install dependencies
 RUN bun install
-RUN bun add prisma typescript tsx @types/node --dev
+
+# Copy the entire project
+COPY . .
+
+# Generate Prisma client
 RUN bun prisma generate
 
-# Build arguments from GitHub Secrets (passed during build)
-ARG DATABASE_URL
-ARG WEBHOOK
-ARG BASE_URL
-ARG GETALL_URL
-ARG SHIFTS_URL
-ARG MANAGER
-ARG EMAIL
-ARG PASS
-ARG JWT
-
-# Create .env file from the passed build arguments
-RUN echo "DATABASE_URL=${DATABASE_URL}" >> .env && \
-    echo "WEBHOOK=${WEBHOOK}" >> .env && \
-    echo "BASE_URL=${BASE_URL}" >> .env && \
-    echo "GETALL_URL=${GETALL_URL}" >> .env && \
-    echo "SHIFTS_URL=${SHIFTS_URL}" >> .env && \
-    echo "MANAGER=${MANAGER}" >> .env && \
-    echo "EMAIL=${EMAIL}" >> .env && \
-    echo "PASS=${PASS}" >> .env && \
-    echo "JWT=${JWT}" >> .env
-
-USER bun
-# Expose the port your app runs on
+# Expose any necessary ports (adjust as needed)
 EXPOSE 3000
 
-# Run your app
+# Command to run the application
 CMD ["bun", "run", "src/index.ts"]
