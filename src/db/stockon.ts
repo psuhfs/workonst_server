@@ -2,7 +2,7 @@ import {MongoClient, Db} from 'mongodb';
 
 const DB_NAME = 'stockon';
 
-class Stockon {
+export class Stockon {
     private static instance: Stockon;
     private client: MongoClient | null = null;
     public db: Db | null = null;

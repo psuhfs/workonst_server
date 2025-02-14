@@ -10,8 +10,6 @@ import type {Token} from "./model.ts";
 import {prisma} from "../handler/db.ts";
 import {sha256Hash} from "./hasher.ts";
 import type {RequestHandler} from "../http/traits.ts";
-import type Stockon from "../db/stockon.ts";
-import exp = require("node:constants");
 
 interface SignupDetails {
     emailid?: string;
@@ -66,7 +64,6 @@ export class SignUpHandler implements RequestHandler {
     async handle(
         req: Request,
         _params: Record<string, string>,
-        _: Stockon | null,
     ): Promise<CustomResponse> {
         return handleAuthSignup(req);
     }
@@ -80,7 +77,6 @@ export class IsAuthenticatedHandler implements RequestHandler {
     async handle(
         req: Request,
         _params: Record<string, string>,
-        _: Stockon | null,
     ): Promise<CustomResponse> {
         let resp = await handleAuth(req);
         let origin = req.headers.get("Origin");

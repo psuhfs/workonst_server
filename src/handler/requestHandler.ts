@@ -31,7 +31,7 @@ router
   .finish(notFound());
 
 export default {
-  handle: async (req: Request, stockon: Stockon) => {
-    return await router.handle(req, stockon);
+  handle: async (req: Request) => {
+    return await router.handle(req);
   },
 };

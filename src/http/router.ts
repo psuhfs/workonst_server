@@ -109,11 +109,11 @@ export class Router {
     return this;
   }
 
-  public async handle(req: Request, db: Stockon | null): Promise<CustomResponse> {
+  public async handle(req: Request): Promise<CustomResponse> {
     const url = new URL(req.url);
-    let resp = await this.handleReq(req, url, db);
+    let resp = await this.handleReq(req, url);
     if (resp === null) {
-      return await this.handleMatch(req, url, db);
+      return await this.handleMatch(req, url);
     }
 
     return resp;
@@ -122,7 +122,6 @@ export class Router {
   private async handleReq(
     req: Request,
     url: URL,
-    db: Stockon | null,
   ): Promise<CustomResponse | null> {
     const method = fromString(req.method);
     if (method === undefined) {
@@ -153,7 +152,7 @@ export class Router {
         if (auth.isErr()) {
           return auth;
         }
-        return handler.handle(req, match, db);
+        return handler.handle(req, match);
       }else {
         console.log("No match for", path, route);
       }
@@ -162,14 +161,14 @@ export class Router {
     return null;
   }
 
-  private async handleMatch(req: Request, url: URL, db: Stockon | null): Promise<CustomResponse> {
+  private async handleMatch(req: Request, url: URL): Promise<CustomResponse> {
     for (const match of this.matches) {
       if (url.pathname.startsWith(match.prefix)) {
         let auth = await match.handler.auth(req);
         if (auth.isErr()) {
           return auth;
         }
-        return match.handler.handle(req, {}, db);
+        return match.handler.handle(req, {});
       }
     }
 

@@ -12,9 +12,6 @@ validate();
 let webhook = process.env.WEBHOOK
     ? new DiscordWebhook(process.env.WEBHOOK)
     : new DebugWebhook();
-let mongo_uri = process.env.MONGO_URI; // should be mongodb://<uname>:<pw>@<host>:<port>
-
-let mongo_db = await Stockon.init(mongo_uri ? mongo_uri : "");
 
 await startBackgroundTask(webhook);
 
@@ -36,7 +33,7 @@ const server = Bun.serve({
         // html me meal coupon violation
         // db edit
         // done: generate report every MON 8am
-        return await requestHandler.handle(request, mongo_db).then(async (resp) => {
+        return await requestHandler.handle(request).then(async (resp) => {
             if (resp.isErr()) {
                 console.debug(resp.error());
             }

@@ -17,7 +17,7 @@ router
   });
 
 export default {
-  handle: async (req: Request, db: Stockon) => {
-    return await router.handle(req, db);
+  handle: async (req: Request) => {
+    return await router.handle(req);
   },
 };

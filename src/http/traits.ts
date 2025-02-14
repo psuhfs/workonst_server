@@ -5,7 +5,6 @@ export interface RequestHandler {
   handle: (
     req: Request,
     params: Record<string, string>,
-    mongo_db: Stockon | null,
   ) => Promise<CustomResponse>;
   auth: (req: Request) => Promise<CustomResponse>;
 }

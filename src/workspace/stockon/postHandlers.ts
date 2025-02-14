@@ -1,32 +1,32 @@
 import {internalServerError, success, unauthorized} from "../../http/responseTemplates.ts";
 import type {CustomResponse} from "../../http/response.ts";
 import {type OrderDetails} from "../../handler/utils.ts";
-import {prisma} from "../../handler/db.ts";
 import {Email} from "../../handler/email.ts";
 import {generateCsvFromItems} from "./generateOrderFile.ts";
 import type {RequestHandler} from "../../http/traits.ts";
 import {extractTokenDetails, extractTokenFromCookie, handleAuth} from "../../auth/handler.ts";
-import type Stockon from "../../db/stockon.ts";
+import {Stockon} from "../../db/stockon.ts";
 import {DateTime} from "luxon";
 
 let managerEmail = process.env.MANAGER || "abg6200@psu.edu";
 
 export class StockEmailSender implements RequestHandler {
-    async handle(req: Request, _: Record<string, string>, db: Stockon | null): Promise<CustomResponse> {
-        if (!db) {
-            // Maybe we should exit here
-            return internalServerError("Database not initialized.");
-        }
-        return this.handleSendEmail(req, db);
+    async handle(req: Request, _: Record<string, string>): Promise<CustomResponse> {
+        return this.handleSendEmail(req);
     }
 
     async auth(req: Request): Promise<CustomResponse> {
         return handleAuth(req);
     }
 
-    async handleSendEmail(req: Request, db: Stockon): Promise<CustomResponse> {
+    async handleSendEmail(req: Request): Promise<CustomResponse> {
         try {
             let body: [OrderDetails] = await req.json();
+            let mongo_uri = process.env.MONGO_URI; // should be mongodb://<uname>:<pw>@<host>:<port>
+
+            // TODO(perf): we should not connect to db per req, we can store instance of db outside
+            let db = await Stockon.init(mongo_uri ? mongo_uri : "");
+
             let access_code = extractAccessCode(req.headers.get("cookie"));
             if (!access_code) {
                 return unauthorized();
@@ -79,7 +79,7 @@ export class StockEmailSender implements RequestHandler {
 
                 // Perform insertion with comprehensive logging
                 const insertOneResult = await collection.insertOne(order);
-                
+
                 // Validate insertion result
                 if (!insertOneResult) {
                     console.error('Insert operation returned undefined');
