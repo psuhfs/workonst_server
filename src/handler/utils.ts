@@ -75,7 +75,5 @@ export interface OrderDetails {
     name: string,
     unit_sz: string,
     quantity: number,
-    // TODO: THIS IS MUST, WE MUST CHECK THE HASH,
-    // we must impl this feature.
-    // hash: string,
+    hash?: string,
 }

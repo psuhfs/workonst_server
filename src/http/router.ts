@@ -125,7 +125,7 @@ export class Router {
   ): Promise<CustomResponse | null> {
     const method = fromString(req.method);
     if (method === undefined) {
-      return invalidRequest(req, `HTTP method: ${req.method} not supported.`);
+      return invalidRequest(req.url, `HTTP method: ${req.method} not supported.`);
     }
 
     const path = url.pathname;

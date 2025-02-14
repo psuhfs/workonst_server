@@ -32,10 +32,10 @@ export function methodNotAllowed(
 }
 
 export function invalidRequest(
-  req: Request,
+  url: string,
   message: string = "Invalid request",
 ): CustomResponse {
-  const body = JSON.stringify({ error: "Bad Request", message, url: req.url });
+  const body = JSON.stringify({ error: "Bad Request", message, url: url });
   return new CustomResponse(
     new Response(body, {
       status: 405,

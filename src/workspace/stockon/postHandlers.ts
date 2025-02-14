@@ -1,4 +1,4 @@
-import {internalServerError, success, unauthorized} from "../../http/responseTemplates.ts";
+import {internalServerError, invalidRequest, success, unauthorized} from "../../http/responseTemplates.ts";
 import type {CustomResponse} from "../../http/response.ts";
 import {type OrderDetails} from "../../handler/utils.ts";
 import {Email} from "../../handler/email.ts";
@@ -7,6 +7,8 @@ import type {RequestHandler} from "../../http/traits.ts";
 import {extractTokenDetails, extractTokenFromCookie, handleAuth} from "../../auth/handler.ts";
 import {Stockon} from "../../db/stockon.ts";
 import {DateTime} from "luxon";
+import {categoriesJson} from "../../static.ts";
+import {sha256Hash} from "../../auth/hasher.ts";
 
 let managerEmail = process.env.MANAGER || "abg6200@psu.edu";
 
@@ -22,6 +24,9 @@ export class StockEmailSender implements RequestHandler {
     async handleSendEmail(req: Request): Promise<CustomResponse> {
         try {
             let body: [OrderDetails] = await req.json();
+            if (!verifyBody(body)) {
+                return invalidRequest(req.url, `Hash for some of the items did not match.`)
+            }
             let mongo_uri = process.env.MONGO_URI; // should be mongodb://<uname>:<pw>@<host>:<port>
 
             // TODO(perf): we should not connect to db per req, we can store instance of db outside
@@ -147,4 +152,33 @@ function generateEmailBody(data: [OrderDetails], accessCode: string, time: Date)
     message += "Thank you,\nStudent Scheduler\n";
 
     return message;
+}
+
+function verifyBody(orders: [OrderDetails]): boolean {
+    let schema = categoriesJson();
+    for (let i = 0; i < orders.length; i++) {
+        if (!orders[i].hash) {
+            return false;
+        }
+
+        let areas: [any] = schema[orders[i].location]["areas"];
+        let area: any | null = null;
+
+        for (let j = 0; j < areas.length; j++) {
+            if (orders[i].area == areas[j]["name"]) {
+                area = areas[j];
+                break;
+            }
+        }
+        if (!area) {
+            return false;
+        }
+        let category = area["info"][orders[i].category];
+        let hash = sha256Hash(JSON.stringify(category));
+
+        if (hash != orders[i].hash) {
+            return false;
+        }
+    }
+    return true;
 }
