@@ -100,19 +100,19 @@ export function internalServerError(
 }
 
 export function success(data: any, origin: string | null): CustomResponse {
-    let resp = new CustomResponse(
-        new Response(JSON.stringify(data), {
-            status: 200,
-            headers: {
-                "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Credentials": "true",
-            },
-        }),
-    );
-    if (origin) {
-        resp.getResponse().headers.set("Access-Control-Allow-Origin", origin);
-    }
+  let resp = new CustomResponse(
+    new Response(JSON.stringify(data), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Credentials": "true",
+      },
+    }),
+  );
+  if (origin) {
+    resp.getResponse().headers.set("Access-Control-Allow-Origin", origin);
+  }
   return resp;
 }
 

@@ -1,15 +1,23 @@
 DBs:
-categories Collection: 
+categories Collection:
+
 ```json
-{ 
- "<location>": { // location could be Stacks, Biscotti, Outpost, Provisions
-        "areas": [{
-            "name": "<area>",
-            "info": {
-                "category": {"item_id": "<item_id>", "name": "<name>", "unit_sz": "<unit_sz>"}
-            }
-        }]
-    }
+{
+  "<location>": {
+    // location could be Stacks, Biscotti, Outpost, Provisions
+    "areas": [
+      {
+        "name": "<area>",
+        "info": {
+          "category": {
+            "item_id": "<item_id>",
+            "name": "<name>",
+            "unit_sz": "<unit_sz>"
+          }
+        }
+      }
+    ]
+  }
 }
 ```
 
