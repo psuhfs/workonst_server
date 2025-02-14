@@ -11,7 +11,7 @@ services:
     depends_on:
       - mongodb
     environment:
-      MONGO_URI: "mongodb://root:example@localhost:27017/mydatabase"
+      MONGO_URI: "mongodb://root:example@localhost:27017"
 
   mongodb:
     image: mongo:latest
