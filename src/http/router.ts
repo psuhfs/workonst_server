@@ -2,6 +2,7 @@ import { fromString, type RequestType } from "./requestType.ts";
 import { invalidRequest, notFound, success } from "./responseTemplates.ts";
 import { CustomResponse } from "./response.ts";
 import type { RequestHandler } from "./traits.ts";
+import type Stockon from "../db/stockon.ts";
 
 type Handler = (
   req: Request,
@@ -108,11 +109,11 @@ export class Router {
     return this;
   }
 
-  public async handle(req: Request): Promise<CustomResponse> {
+  public async handle(req: Request, db: Stockon | null): Promise<CustomResponse> {
     const url = new URL(req.url);
-    let resp = await this.handleReq(req, url);
+    let resp = await this.handleReq(req, url, db);
     if (resp === null) {
-      return await this.handleMatch(req, url);
+      return await this.handleMatch(req, url, db);
     }
 
     return resp;
@@ -121,6 +122,7 @@ export class Router {
   private async handleReq(
     req: Request,
     url: URL,
+    db: Stockon | null,
   ): Promise<CustomResponse | null> {
     const method = fromString(req.method);
     if (method === undefined) {
@@ -151,7 +153,7 @@ export class Router {
         if (auth.isErr()) {
           return auth;
         }
-        return handler.handle(req, match);
+        return handler.handle(req, match, db);
       }else {
         console.log("No match for", path, route);
       }
@@ -160,14 +162,14 @@ export class Router {
     return null;
   }
 
-  private async handleMatch(req: Request, url: URL): Promise<CustomResponse> {
+  private async handleMatch(req: Request, url: URL, db: Stockon | null): Promise<CustomResponse> {
     for (const match of this.matches) {
       if (url.pathname.startsWith(match.prefix)) {
         let auth = await match.handler.auth(req);
         if (auth.isErr()) {
           return auth;
         }
-        return match.handler.handle(req, {});
+        return match.handler.handle(req, {}, db);
       }
     }
 

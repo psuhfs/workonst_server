@@ -13,19 +13,25 @@ categories Collection:
 }
 ```
 
-orders Collection:
+orders Collection (single entry):
 
 ```json
-[
+{
+  "access_code": "<access_code>",
+  "email_recipients": "<email_recipients>",
+  "order_date": "<order_date>",
+  "orders": [
     {
-        "location": "<location>",
-        "area": "<area>",
-        "category": "<category>",
-        "item_id": "<item_id>",
-        "name": "<name>", 
-        "unit_sz": "<unit_sz>",
-        "quantity": <quentity> // integer
-        "timestamp": <time sinze epoch>
+      "location": "<location>",
+      "area": "<area>",
+      "category": "<category>",
+      "item_id": "<item_id>",
+      "name": "<name>",
+      "unit_sz": "<unit_sz>",
+      "quantity": <quentity>
+      // integer
+      "timestamp": "<time sinze epoch>"
     }
-]
+  ]
+}
 ```

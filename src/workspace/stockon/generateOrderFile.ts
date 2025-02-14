@@ -1,22 +1,25 @@
 import { createObjectCsvStringifier } from "csv-writer";
 import { type OrderDetails } from "../../handler/utils.ts";
 
-export function generateCsvFromItems(orderDetails: OrderDetails): string {
+export function generateCsvFromItems(orderDetails: [OrderDetails]): string {
   try {
-    if (!orderDetails.items || orderDetails.items.length === 0) {
+    if (orderDetails.length === 0) {
       console.error("No items to write to CSV.");
       return "";
     }
 
     const csvWriter = createObjectCsvStringifier({
       header: [
-        { id: "Item_ID", title: "Item ID" },
-        { id: "Name", title: "Name" },
-        { id: "Unit_Size", title: "Unit Size" },
-        { id: "Order_Quantity", title: "Order Quantity" },
+        { id: "item_id", title: "Item ID" },
+        { id: "name", title: "Name" },
+        { id: "unit_sz", title: "Unit Size" },
+        { id: "quantity", title: "Order Quantity" },
+        { id: "location", title: "Location" },
+        { id: "area", title: "Area" },
+        { id: "category", title: "Category" },
       ],
     });
-    return csvWriter.stringifyRecords(orderDetails.items);
+    return csvWriter.stringifyRecords(orderDetails);
   } catch (error) {
     return "";
   }
