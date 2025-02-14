@@ -1,5 +1,6 @@
 DBs:
 categories Collection: 
+```json
 { 
  "<location>": { // location could be Stacks, Biscotti, Outpost, Provisions
         "areas": [{
@@ -10,9 +11,11 @@ categories Collection:
         }]
     }
 }
+```
 
 orders Collection:
 
+```json
 [
     {
         "location": "<location>",
@@ -25,5 +28,4 @@ orders Collection:
         "timestamp": <time sinze epoch>
     }
 ]
-
-
+```
