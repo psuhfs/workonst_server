@@ -20,7 +20,7 @@ router
   .add(RequestType.POST, "/auth/signin", new SignInHandler(), {
     description: "Helps to signin.",
   })
-  .add(RequestType.POST, "/auth/authenticated", new IsAuthenticatedHandler(), {
+  .add(RequestType.GET, "/auth/authenticated", new IsAuthenticatedHandler(), {
     description: "Checks if user is authenticated.",
   })
   .match("/workon", workOn.handle, {
