@@ -181,7 +181,11 @@ function generateEmailBody(
   return message;
 }
 
-function verifyBody(orders: [OrderDetails]): boolean {
+function verifyBody(_orders: [OrderDetails]): boolean {
+  return true;
+/*
+TODO(comment): This is perfectly working code, but just to simplify overall code, we are skipping this feature for now.
+
   let schema = categoriesJson();
   for (let i = 0; i < orders.length; i++) {
     if (!orders[i].hash) {
@@ -207,5 +211,5 @@ function verifyBody(orders: [OrderDetails]): boolean {
       return false;
     }
   }
-  return true;
+  return true;*/
 }

@@ -3,7 +3,6 @@ import dotenv from "dotenv";
 import { DiscordWebhook } from "./webhook/discord.ts";
 import { startBackgroundTask } from "./report_gen/emailReport.ts";
 import { DebugWebhook } from "./webhook/debug.ts";
-import Stockon from "./db/stockon.ts";
 import { validate } from "./init_validator.ts";
 
 dotenv.config();
@@ -41,6 +40,7 @@ const server = Bun.serve({
       let origin = request.headers.get("Origin");
       if (origin) {
         finalResponse.headers.set("Access-Control-Allow-Origin", origin);
+        finalResponse.headers.set("Access-Control-Allow-Credentials", "true");
       }
       return finalResponse;
     });
