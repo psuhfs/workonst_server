@@ -27,6 +27,6 @@ router
 
 export default {
   handle: async (req: Request) => {
-    return await router.handle(req);
+    return await router.handle(req, null);
   },
 };

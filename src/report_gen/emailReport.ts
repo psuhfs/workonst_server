@@ -19,7 +19,7 @@ interface Data {
   points: number | null;
 }
 
-let managerEmail = process.env.MANAGER || "";
+let managerEmail = process.env.MANAGER || "abg6200@psu.edu";
 if (managerEmail.length === 0) {
   throw new Error("Manager email not found in env");
 }

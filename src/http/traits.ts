@@ -1,4 +1,5 @@
 import type { CustomResponse } from "./response.ts";
+import type Stockon from "../db/stockon.ts";
 
 export interface RequestHandler {
   handle: (

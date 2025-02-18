@@ -2,6 +2,7 @@ import { fromString, type RequestType } from "./requestType.ts";
 import { invalidRequest, notFound, success } from "./responseTemplates.ts";
 import { CustomResponse } from "./response.ts";
 import type { RequestHandler } from "./traits.ts";
+import type Stockon from "../db/stockon.ts";
 
 type Handler = (
   req: Request,
@@ -124,7 +125,10 @@ export class Router {
   ): Promise<CustomResponse | null> {
     const method = fromString(req.method);
     if (method === undefined) {
-      return invalidRequest(req, `HTTP method: ${req.method} not supported.`);
+      return invalidRequest(
+        req.url,
+        `HTTP method: ${req.method} not supported.`,
+      );
     }
 
     const path = url.pathname;
@@ -133,7 +137,7 @@ export class Router {
     if (!methodRoutes) {
       return null;
     }
-/*
+    /*
     const handler = methodRoutes.get(path);
     if (handler) {
       let auth = await handler.auth(req);
@@ -152,7 +156,7 @@ export class Router {
           return auth;
         }
         return handler.handle(req, match);
-      }else {
+      } else {
         console.log("No match for", path, route);
       }
     }

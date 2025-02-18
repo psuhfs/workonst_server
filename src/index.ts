@@ -3,8 +3,10 @@ import dotenv from "dotenv";
 import { DiscordWebhook } from "./webhook/discord.ts";
 import { startBackgroundTask } from "./report_gen/emailReport.ts";
 import { DebugWebhook } from "./webhook/debug.ts";
+import { validate } from "./init_validator.ts";
 
 dotenv.config();
+validate();
 
 let webhook = process.env.WEBHOOK
   ? new DiscordWebhook(process.env.WEBHOOK)
@@ -30,11 +32,17 @@ const server = Bun.serve({
     // html me meal coupon violation
     // db edit
     // done: generate report every MON 8am
-    return await requestHandler.handle(request).then((resp) => {
+    return await requestHandler.handle(request).then(async (resp) => {
       if (resp.isErr()) {
         console.debug(resp.error());
       }
-      return resp.intoResponse(webhook);
+      let finalResponse = await resp.intoResponse(webhook);
+      let origin = request.headers.get("Origin");
+      if (origin) {
+        finalResponse.headers.set("Access-Control-Allow-Origin", origin);
+        finalResponse.headers.set("Access-Control-Allow-Credentials", "true");
+      }
+      return finalResponse;
     });
   },
 });

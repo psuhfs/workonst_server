@@ -11,27 +11,14 @@ import {prisma} from "../handler/db.ts";
 import {sha256Hash} from "./hasher.ts";
 import type {RequestHandler} from "../http/traits.ts";
 
-interface SignupDetails {
-    emailid?: string;
-    token: string;
-}
-
 interface AuthModel {
     username: string;
     password: string;
-    signupDetails?: SignupDetails;
+    emailid?: string;
 }
 
 // TODO: should maintain a map
 export async function handleAuth(req: Request): Promise<CustomResponse> {
-    function extractTokenFromCookie(cookie: string) {
-        let token = cookie.split(";").find((c) => c.includes("token"));
-        if (token === undefined) {
-            return "";
-        }
-        return token.split("=")[1];
-    }
-
     try {
         let token = req.headers.get("Authorization");
         if (token === null) {
@@ -45,11 +32,17 @@ export async function handleAuth(req: Request): Promise<CustomResponse> {
             token = token.replace("Bearer ", "");
         }
 
-        let authResp = await processAuth(token ? {token} : {token: ""}, req.headers.get("Origin"));
+        let authResp = await processAuth(
+            token ? {token} : {token: ""},
+            req.headers.get("Origin"),
+        );
         if (!authResp.getResponse().ok) {
             return authResp;
         }
-        return successHeaders({message: "Auth Successful."}, {"Access-Control-Allow-Origin": `${req.headers.get("Origin")}`});
+        return successHeaders(
+            {message: "Auth Successful."},
+            {"Access-Control-Allow-Origin": `${req.headers.get("Origin")}`},
+        );
     } catch (e: any) {
         return internalServerError("Unable to process auth request.", e.toString());
     }
@@ -115,7 +108,12 @@ export class SignInHandler implements RequestHandler {
 export async function handleAuthSignup(req: Request): Promise<CustomResponse> {
     try {
         let body: AuthModel = await req.json();
-        return await processAuthSignup(body, req.headers.get("Origin"));
+        let cookie = req.headers.get("Cookie");
+        if (cookie === null) {
+            return unauthorized("No token provided.");
+        }
+        let token = extractTokenFromCookie(cookie);
+        return await processAuthSignup(body, req.headers.get("Origin"), {token});
     } catch (e: any) {
         return internalServerError(
             "Unable to process auth signup request.",
@@ -124,17 +122,26 @@ export async function handleAuthSignup(req: Request): Promise<CustomResponse> {
     }
 }
 
-async function processAuth(body: Token, origin: string | null): Promise<CustomResponse> {
+async function processAuth(
+    body: Token,
+    origin: string | null,
+): Promise<CustomResponse> {
     if (verifyToken(body)) {
-        return success({
-            message: "Auth Successful.",
-        }, origin);
+        return success(
+            {
+                message: "Auth Successful.",
+            },
+            origin,
+        );
     } else {
         return unauthorized();
     }
 }
 
-async function processAuthSignin(body: AuthModel, origin: string | null): Promise<CustomResponse> {
+async function processAuthSignin(
+    body: AuthModel,
+    origin: string | null,
+): Promise<CustomResponse> {
     body.password = sha256Hash(body.password);
 
     let val = await prisma.crew_leaders.findUnique({
@@ -160,13 +167,12 @@ async function processAuthSignin(body: AuthModel, origin: string | null): Promis
     return successHeaders(token, headers);
 }
 
-async function processAuthSignup(body: AuthModel, origin: string | null): Promise<CustomResponse> {
-    if (body.signupDetails === undefined) {
-        return unauthorized("No signup details provided.");
-    }
-    let token = body.signupDetails.token;
-
-    let details = extractTokenDetails({token});
+async function processAuthSignup(
+    body: AuthModel,
+    origin: string | null,
+    token: Token,
+): Promise<CustomResponse> {
+    let details = extractTokenDetails(token);
 
     if (details === undefined) {
         return unauthorized("Invalid signup details.");
@@ -186,8 +192,8 @@ async function processAuthSignup(body: AuthModel, origin: string | null): Promis
         data: {
             username: body.username,
             password: sha256Hash(body.password),
-            emailid: body.signupDetails.emailid
-                ? body.signupDetails.emailid
+            emailid: body.emailid
+                ? body.emailid
                 : `${body.username}@psu.edu`,
         },
     });
@@ -204,6 +210,14 @@ function genToken(body: AuthModel): Token {
     return {
         token,
     };
+}
+
+export function extractTokenFromCookie(cookie: string) {
+    let token = cookie.split(";").find((c) => c.includes("token"));
+    if (token === undefined) {
+        return "";
+    }
+    return token.split("=")[1];
 }
 
 export function extractTokenDetails(token: Token): any {
