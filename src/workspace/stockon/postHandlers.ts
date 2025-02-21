@@ -15,8 +15,7 @@ import {
 import { Stockon } from "../../db/stockon.ts";
 import { DateTime } from "luxon";
 import {extractTokenDetails, extractTokenFromHeaders} from "../../auth/token_extractor.ts";
-
-let managerEmail = process.env.MANAGER || "abg6200@psu.edu";
+import {managerEmail} from "../../wellknown/emails.ts";
 
 export class StockEmailSender implements RequestHandler {
   async handle(
@@ -168,6 +167,23 @@ function generateEmailBody(
   message += "Thank you,\nStudent Scheduler\n";
 
   return message;
+}
+
+export class StockEditItems implements RequestHandler {
+    async handle(
+        req: Request,
+        _: Record<string, string>,
+    ): Promise<CustomResponse> {
+        return this.handleEditItems(req);
+    }
+
+    async auth(req: Request): Promise<CustomResponse> {
+        return handleAuth(req);
+    }
+
+    async handleEditItems(req: Request): Promise<CustomResponse> {
+
+    }
 }
 
 function verifyBody(_orders: [OrderDetails]): boolean {

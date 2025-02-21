@@ -4,6 +4,7 @@ import { Email, type File } from "../handler/email.ts";
 import type { Webhook } from "../webhook/traits.ts";
 import { CustomError } from "../errors/error.ts";
 import schedule from "node-schedule";
+import {managerEmail} from "../wellknown/emails.ts";
 
 interface Data {
   id: number;
@@ -17,11 +18,6 @@ interface Data {
   comments: string | null;
   email: string | null;
   points: number | null;
-}
-
-let managerEmail = process.env.MANAGER || "abg6200@psu.edu";
-if (managerEmail.length === 0) {
-  throw new Error("Manager email not found in env");
 }
 
 // Fetch data from the past 7 days

@@ -2,6 +2,8 @@
 // requests and responses.
 // This file should not contain any core logic.
 
+// TODO: move these to local files named model.ts
+
 // WorkOn Interfaces
 export interface PointsDetails {
   accessCode?: string;
