@@ -1,11 +1,5 @@
-import TTLCache from "@isaacs/ttlcache";
 import type { Employee, EmployeeList, ShiftList } from "../../handler/utils.ts";
-
-// Initialize the cache
-const cache = new TTLCache({
-  max: 1000,
-  ttl: 86400000, // Cache for 1 day
-});
+import {getEmployeeCache} from "../../cache/cache.ts";
 
 /**
  * Makes an HTTP request to a given URL with caching.
@@ -20,7 +14,7 @@ export async function getEmployees(
   }
   const cacheKey = url;
 
-  let cachedData: EmployeeList | undefined = cache.get(cacheKey);
+  let cachedData: EmployeeList | undefined = getEmployeeCache.get(cacheKey);
   if (cachedData !== undefined) {
     return cachedData;
   }
@@ -41,7 +35,7 @@ export async function getEmployees(
   const data: EmployeeList = await response.json();
 
   // Store the response in the cache
-  cache.set(cacheKey, data);
+  getEmployeeCache.set(cacheKey, data);
 
   return data;
 }
@@ -88,7 +82,7 @@ export async function getShift(
   url = url.split("{{formattedDate}}").join(formattedDate);
 
   const cacheKey = url;
-  let cachedData: ShiftList | undefined = cache.get(cacheKey);
+  let cachedData: ShiftList | undefined = getEmployeeCache.get(cacheKey);
   if (cachedData !== undefined) {
     return cachedData;
   }
@@ -101,7 +95,7 @@ export async function getShift(
     throw new Error(`HTTP error! Status: ${response.status}`);
   }
   const data: ShiftList = await response.json();
-  cache.set(cacheKey, data);
+  getEmployeeCache.set(cacheKey, data);
 
   return data;
 }

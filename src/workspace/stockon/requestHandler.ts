@@ -14,6 +14,9 @@ router
   .add(RequestType.POST, "/addItems", new StockEmailSender(), {
     description:
       "Sends email to logged in user and specified organization members",
+  }).add(RequestType.POST, "/editItems", new StockEmailSender(), {
+    description:
+      "Sends email to logged in user and specified organization members",
   });
 
 export default {
