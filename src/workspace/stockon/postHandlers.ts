@@ -10,14 +10,11 @@ import { Email } from "../../handler/email.ts";
 import { generateCsvFromItems } from "./generateOrderFile.ts";
 import type { RequestHandler } from "../../http/traits.ts";
 import {
-  extractTokenDetails,
-  extractTokenFromCookie,
   handleAuth,
 } from "../../auth/handler.ts";
 import { Stockon } from "../../db/stockon.ts";
 import { DateTime } from "luxon";
-import { categoriesJson } from "../../static.ts";
-import { sha256Hash } from "../../auth/hasher.ts";
+import {extractTokenDetails, extractTokenFromHeaders} from "../../auth/token_extractor.ts";
 
 let managerEmail = process.env.MANAGER || "abg6200@psu.edu";
 
@@ -47,10 +44,12 @@ export class StockEmailSender implements RequestHandler {
       // TODO(perf): we should not connect to db per req, we can store instance of db outside
       let db = await Stockon.init(mongo_uri ? mongo_uri : "");
 
-      let access_code = extractAccessCode(req.headers);
-      if (!access_code) {
+      let token = extractTokenFromHeaders(req.headers);
+      if (!token) {
         return unauthorized();
       }
+
+      let access_code = extractTokenDetails({token})["username"];
 
       const curTime = DateTime.now()
         .setZone("America/New_York")
@@ -128,26 +127,6 @@ export class StockEmailSender implements RequestHandler {
       );
     }
   }
-}
-
-function extractAccessCode(headers: Headers): string | null {
-  let token = headers.get("Authorization");
-  if (token === null) {
-    let cookie = headers.get("cookie");
-    if (cookie === null) {
-      return null;
-    }
-    token = extractTokenFromCookie(cookie);
-  } else {
-    token = token.replace("Bearer ", "");
-  }
-  if (!token) return null;
-
-  let token_info = extractTokenDetails({
-    token,
-  });
-  let referer: string = token_info["username"];
-  return `${referer}@psu.edu`;
 }
 
 function generateEmailBody(

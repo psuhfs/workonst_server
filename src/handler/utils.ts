@@ -4,7 +4,7 @@
 
 // WorkOn Interfaces
 export interface PointsDetails {
-  accessCode: string;
+  accessCode?: string;
   employeeName: string;
   employeeId?: string;
   shiftDate: string;

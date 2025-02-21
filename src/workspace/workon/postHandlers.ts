@@ -5,8 +5,9 @@ import { Email } from "../../handler/email.ts";
 import { internalServerError, success } from "../../http/responseTemplates.ts";
 import { getShift } from "./employeeRecords.ts";
 import type { New_Table_Name } from "@prisma/client";
-import { extractTokenDetails, handleAuth } from "../../auth/handler.ts";
+import { handleAuth } from "../../auth/handler.ts";
 import type { RequestHandler } from "../../http/traits.ts";
+import {extractTokenDetails, extractTokenFromHeaders} from "../../auth/token_extractor.ts";
 
 function pointDetToTable(body: PointsDetails): New_Table_Name | Error {
   try {
@@ -65,15 +66,10 @@ export class IncrHandler implements RequestHandler {
       }
 
       let body: PointsDetails = await req.json();
-      let cookie = req.headers.get("cookie");
-      if (cookie) {
-        let token = cookie.split(";").find((c) => c.includes("token"));
-        if (token) {
-          token = token.split("=")[1];
-
-          console.log(extractTokenDetails({ token }));
-          body.accessCode = extractTokenDetails({ token })["username"];
-        }
+      let token = extractTokenFromHeaders(req.headers);
+      if (token) {
+        // console.log(extractTokenDetails({ token }));
+        body.accessCode = extractTokenDetails({ token })["username"];
       }
 
       new Db(prisma.new_Table_Name, body).send().then(populateErr);

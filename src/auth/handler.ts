@@ -10,6 +10,7 @@ import type {Token} from "./model.ts";
 import {prisma} from "../handler/db.ts";
 import {sha256Hash} from "./hasher.ts";
 import type {RequestHandler} from "../http/traits.ts";
+import {extractTokenDetails, extractTokenFromHeaders} from "./token_extractor.ts";
 
 interface AuthModel {
     username: string;
@@ -20,20 +21,12 @@ interface AuthModel {
 // TODO: should maintain a map
 export async function handleAuth(req: Request): Promise<CustomResponse> {
     try {
-        let token = req.headers.get("Authorization");
-        if (token === null) {
-            console.log(req);
-            let cookie = req.headers.get("cookie");
-            if (cookie === null) {
-                return unauthorized("No token provided.");
-            }
-            token = extractTokenFromCookie(cookie);
-        } else {
-            token = token.replace("Bearer ", "");
+        let token = extractTokenFromHeaders(req.headers);
+        if (!token) {
+            return unauthorized("No token provided.");
         }
-
         let authResp = await processAuth(
-            token ? {token} : {token: ""},
+            {token},
             req.headers.get("Origin"),
         );
         if (!authResp.getResponse().ok) {
@@ -108,11 +101,10 @@ export class SignInHandler implements RequestHandler {
 export async function handleAuthSignup(req: Request): Promise<CustomResponse> {
     try {
         let body: AuthModel = await req.json();
-        let cookie = req.headers.get("Cookie");
-        if (cookie === null) {
+        let token = extractTokenFromHeaders(req.headers);
+        if (token === null) {
             return unauthorized("No token provided.");
         }
-        let token = extractTokenFromCookie(cookie);
         return await processAuthSignup(body, req.headers.get("Origin"), {token});
     } catch (e: any) {
         return internalServerError(
@@ -210,22 +202,6 @@ function genToken(body: AuthModel): Token {
     return {
         token,
     };
-}
-
-export function extractTokenFromCookie(cookie: string) {
-    let token = cookie.split(";").find((c) => c.includes("token"));
-    if (token === undefined) {
-        return "";
-    }
-    return token.split("=")[1];
-}
-
-export function extractTokenDetails(token: Token): any {
-    try {
-        return jwt.verify(token.token, process.env.JWT);
-    } catch (e) {
-        return undefined;
-    }
 }
 
 function verifyToken(token: Token): boolean {
