@@ -47,7 +47,7 @@ export class StockEmailSender implements RequestHandler {
       // TODO(perf): we should not connect to db per req, we can store instance of db outside
       let db = await Stockon.init(mongo_uri ? mongo_uri : "");
 
-      let access_code = extractAccessCode(req.headers.get("cookie"));
+      let access_code = extractAccessCode(req.headers);
       if (!access_code) {
         return unauthorized();
       }
@@ -111,7 +111,7 @@ export class StockEmailSender implements RequestHandler {
         }
 
         console.log("Order inserted successfully:", insertOneResult);
-      } catch (insertError) {
+      } catch (insertError: any) {
         console.error("MongoDB Insertion Error:", insertError);
         return internalServerError(
           `Database insertion failed: ${insertError.message}`,
@@ -130,11 +130,21 @@ export class StockEmailSender implements RequestHandler {
   }
 }
 
-function extractAccessCode(cookies: string | null): string | null {
-  if (!cookies) return null;
+function extractAccessCode(headers: Headers): string | null {
+  let token = headers.get("Authorization");
+  if (token === null) {
+    let cookie = headers.get("cookie");
+    if (cookie === null) {
+      return null;
+    }
+    token = extractTokenFromCookie(cookie);
+  } else {
+    token = token.replace("Bearer ", "");
+  }
+  if (!token) return null;
 
   let token_info = extractTokenDetails({
-    token: extractTokenFromCookie(cookies),
+    token,
   });
   let referer: string = token_info["username"];
   return `${referer}@psu.edu`;
