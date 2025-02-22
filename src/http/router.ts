@@ -2,7 +2,7 @@ import { fromString, type RequestType } from "./requestType.ts";
 import { invalidRequest, notFound, success } from "./responseTemplates.ts";
 import { CustomResponse } from "./response.ts";
 import type { RequestHandler } from "./traits.ts";
-import type Stockon from "../db/stockon.ts";
+import type MongoDB from "../db/mongoDB.ts";
 
 type Handler = (
   req: Request,

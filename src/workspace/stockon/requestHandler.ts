@@ -2,7 +2,7 @@ import { Router } from "../../http/router.ts";
 import { RequestType } from "../../http/requestType.ts";
 import { StockEmailSender } from "./postHandlers.ts";
 import { GetItems } from "./getHandlers.ts";
-import type Stockon from "../../db/stockon.ts";
+import type MongoDB from "../../db/mongoDB.ts";
 
 const router = new Router("/stockon");
 

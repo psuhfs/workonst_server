@@ -4,12 +4,12 @@ export const enum DBCollection {
     STOCKON = "stockon",
 }
 
-export class Stockon {
+export class MongoDB {
     private client: MongoClient | null = null;
     public db: Db | null = null;
 
-    public static async init(uri: string, db: DBCollection): Promise<Stockon> {
-        let stockon = new Stockon();
+    public static async init(uri: string, db: DBCollection): Promise<MongoDB> {
+        let stockon = new MongoDB();
         await stockon.connect(uri, db);
         return stockon;
     }
@@ -61,4 +61,4 @@ export class Stockon {
     }
 }
 
-export default Stockon;
+export default MongoDB;

@@ -5,7 +5,7 @@ import {Email} from "../../handler/email.ts";
 import {generateCsvFromItems} from "./generateOrderFile.ts";
 import type {RequestHandler} from "../../http/traits.ts";
 import {handleAuth,} from "../../auth/handler.ts";
-import {DBCollection, Stockon} from "../../db/stockon.ts";
+import {DBCollection, MongoDB} from "../../db/mongoDB.ts";
 import {DateTime} from "luxon";
 import {extractTokenDetails, extractTokenFromHeaders} from "../../auth/token_extractor.ts";
 import {managerEmail} from "../../wellknown/emails.ts";
@@ -34,7 +34,7 @@ export class StockEmailSender implements RequestHandler {
       let mongo_uri = process.env.MONGO_URI; // should be mongodb://<uname>:<pw>@<host>:<port>
 
       // TODO(perf): we should not connect to stockonDb per req, we can store instance of stockonDb outside
-      let stockonDb = await Stockon.init(mongo_uri ? mongo_uri : "", DBCollection.STOCKON);
+      let stockonDb = await MongoDB.init(mongo_uri ? mongo_uri : "", DBCollection.STOCKON);
 
       let token = extractTokenFromHeaders(req.headers);
       if (!token) {

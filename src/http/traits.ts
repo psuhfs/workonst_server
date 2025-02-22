@@ -1,5 +1,5 @@
 import type { CustomResponse } from "./response.ts";
-import type Stockon from "../db/stockon.ts";
+import type MongoDB from "../db/mongoDB.ts";
 
 export interface RequestHandler {
   handle: (

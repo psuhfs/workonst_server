@@ -8,7 +8,7 @@ import {
   SignInHandler,
   SignUpHandler,
 } from "../auth/handler.ts";
-import type Stockon from "../db/stockon.ts";
+import type MongoDB from "../db/mongoDB.ts";
 
 const router = new Router();
 
