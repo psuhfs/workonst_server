@@ -4,6 +4,11 @@ export const enum DBCollection {
     STOCKON = "stockon",
 }
 
+const enum Collections {
+    CATEGORIES = "categories",
+    ORDERS = "orders",
+}
+
 export class MongoDB {
     private client: MongoClient | null = null;
     public db: Db | null = null;
@@ -34,13 +39,15 @@ export class MongoDB {
         if (!this.db) {
             return;
         }
-        // Ensure categories collection exists
-        const categoriesCollectionExists = await this.db
-            .listCollections({name: "categories"})
-            .hasNext();
-        if (!categoriesCollectionExists) {
-            await this.db.createCollection("categories");
-            console.log("Created categories collection");
+        // Ensure all collection exists
+        for (const collection of Object.values(Collections)) {
+            const categoriesCollectionExists = await this.db
+                .listCollections({name: (collection as string)})
+                .hasNext();
+            if (!categoriesCollectionExists) {
+                await this.db.createCollection(collection as string);
+                console.log(`Created ${collection} collection`);
+            }
         }
 
         // Ensure orders collection exists
