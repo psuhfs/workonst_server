@@ -1,19 +1,12 @@
-import {
-  internalServerError,
-  invalidRequest,
-  success,
-  unauthorized,
-} from "../../http/responseTemplates.ts";
-import type { CustomResponse } from "../../http/response.ts";
-import { type OrderDetails } from "../../handler/utils.ts";
-import { Email } from "../../handler/email.ts";
-import { generateCsvFromItems } from "./generateOrderFile.ts";
-import type { RequestHandler } from "../../http/traits.ts";
-import {
-  handleAuth,
-} from "../../auth/handler.ts";
-import { Stockon } from "../../db/stockon.ts";
-import { DateTime } from "luxon";
+import {internalServerError, invalidRequest, success, unauthorized,} from "../../http/responseTemplates.ts";
+import type {CustomResponse} from "../../http/response.ts";
+import {type OrderDetails} from "../../handler/utils.ts";
+import {Email} from "../../handler/email.ts";
+import {generateCsvFromItems} from "./generateOrderFile.ts";
+import type {RequestHandler} from "../../http/traits.ts";
+import {handleAuth,} from "../../auth/handler.ts";
+import {DBCollection, Stockon} from "../../db/stockon.ts";
+import {DateTime} from "luxon";
 import {extractTokenDetails, extractTokenFromHeaders} from "../../auth/token_extractor.ts";
 import {managerEmail} from "../../wellknown/emails.ts";
 
@@ -40,8 +33,8 @@ export class StockEmailSender implements RequestHandler {
       }
       let mongo_uri = process.env.MONGO_URI; // should be mongodb://<uname>:<pw>@<host>:<port>
 
-      // TODO(perf): we should not connect to db per req, we can store instance of db outside
-      let db = await Stockon.init(mongo_uri ? mongo_uri : "");
+      // TODO(perf): we should not connect to stockonDb per req, we can store instance of stockonDb outside
+      let stockonDb = await Stockon.init(mongo_uri ? mongo_uri : "", DBCollection.STOCKON);
 
       let token = extractTokenFromHeaders(req.headers);
       if (!token) {
@@ -87,13 +80,13 @@ export class StockEmailSender implements RequestHandler {
 
       try {
         // Ensure the database connection exists
-        if (!db.db) {
+        if (!stockonDb.db) {
           console.error("Database connection is not established");
           return internalServerError("Database connection failed");
         }
 
         // Get the collection with explicit error handling
-        const collection = db.db.collection("orders");
+        const collection = stockonDb.db.collection("orders");
         if (!collection) {
           console.error("Orders collection not found");
           return internalServerError("Collection not found");
