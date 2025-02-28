@@ -85,12 +85,13 @@ export enum Zone {
   Root= "Root",
   WorkOn = "WorkOn",
   StockOn = "StockOn",
+  SignUp = "SignUp",
 }
 
 // Should be used to verify user access to the categories.
 export enum StockOnCategories {
-  Biscotti,
-  Stacks,
-  Outpost,
-  Provisions,
+  Biscotti= "Biscotti",
+  Stacks = "Stacks",
+  Outpost = "Outpost",
+  Provisions = "Provisions",
 }

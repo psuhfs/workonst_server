@@ -7,10 +7,19 @@ import {
 } from "../http/responseTemplates.ts";
 import jwt from "jsonwebtoken";
 import type {Token} from "./model.ts";
-import {prisma} from "../handler/db.ts";
 import {sha256Hash} from "./hasher.ts";
 import type {RequestHandler} from "../http/traits.ts";
 import {extractTokenDetails, extractTokenFromHeaders} from "./token_extractor.ts";
+import {createUser, getUserByUsername, modifyAccess} from "../dbUtils/user_schema.ts";
+import {Zone} from "../handler/utils.ts";
+
+interface SignupDetails {
+    username: string;
+    password: string;
+    emailid?: string;
+    zonalAccess: [string],
+    stockonAccess: [string],
+}
 
 interface AuthModel {
     username: string;
@@ -100,7 +109,7 @@ export class SignInHandler implements RequestHandler {
 
 export async function handleAuthSignup(req: Request): Promise<CustomResponse> {
     try {
-        let body: AuthModel = await req.json();
+        let body: SignupDetails = await req.json();
         let token = extractTokenFromHeaders(req.headers);
         if (token === null) {
             return unauthorized("No token provided.");
@@ -135,15 +144,8 @@ async function processAuthSignin(
     origin: string | null,
 ): Promise<CustomResponse> {
     body.password = sha256Hash(body.password);
-
-    let val = await prisma.crew_leaders.findUnique({
-        where: {
-            username: body.username,
-            password: body.password,
-        },
-    });
-
-    if (val === null) {
+    let val = await getUserByUsername(body.username, body.password);
+    if (val === undefined) {
         return unauthorized("Invalid username or password.");
     }
 
@@ -160,7 +162,7 @@ async function processAuthSignin(
 }
 
 async function processAuthSignup(
-    body: AuthModel,
+    body: SignupDetails,
     origin: string | null,
     token: Token,
 ): Promise<CustomResponse> {
@@ -169,26 +171,28 @@ async function processAuthSignup(
     if (details === undefined) {
         return unauthorized("Invalid signup details.");
     }
-    let referer: string = details["username"];
-    let val = await prisma.crew_leaders.findUnique({
-        where: {
-            username: referer,
-        },
-    });
-
+    let val = await getUserByUsername(details["username"], details["pw"]);
     if (val === null) {
         return unauthorized("Invalid signup details.");
     }
 
-    await prisma.crew_leaders.create({
-        data: {
-            username: body.username,
-            password: sha256Hash(body.password),
-            emailid: body.emailid
-                ? body.emailid
-                : `${body.username}@psu.edu`,
-        },
-    });
+    let za: [string] = val.zonalAccess;
+    if (za.find((v) => v.toLowerCase() == Zone.SignUp.toLowerCase()) === undefined) {
+        return unauthorized("You do not have permission to signup users.");
+    }
+
+    body.zonalAccess.push(Zone.Root);
+    if (body.stockonAccess.length > 0) {
+        body.zonalAccess.push(Zone.StockOn);
+    }
+
+    let inserted = await createUser(body.username, body.emailid
+        ? body.emailid
+        : `${body.username}@psu.edu`, body.password, body.zonalAccess, body.stockonAccess);
+
+    if (!inserted) {
+        return internalServerError("Unable to create user. (Probably user already exists)");
+    }
 
     return success({message: "Signup successful."}, origin);
 }

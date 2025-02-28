@@ -5,7 +5,7 @@ import {Email} from "../../handler/email.ts";
 import {generateCsvFromItems} from "./generateOrderFile.ts";
 import type {RequestHandler} from "../../http/traits.ts";
 import {handleAuth,} from "../../auth/handler.ts";
-import {DBCollection, MongoDB} from "../../db/mongoDB.ts";
+import {Collections, DBCollection, MongoDB} from "../../db/mongoDB.ts";
 import {DateTime} from "luxon";
 import {extractTokenDetails, extractTokenFromHeaders} from "../../auth/token_extractor.ts";
 import {managerEmail} from "../../wellknown/emails.ts";
@@ -86,7 +86,7 @@ export class StockEmailSender implements RequestHandler {
         }
 
         // Get the collection with explicit error handling
-        const collection = stockonDb.db.collection("orders");
+        const collection = stockonDb.db.collection(Collections.ORDERS);
         if (!collection) {
           console.error("Orders collection not found");
           return internalServerError("Collection not found");

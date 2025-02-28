@@ -4,9 +4,10 @@ export const enum DBCollection {
     STOCKON = "stockon",
 }
 
-const enum Collections {
+export const enum Collections {
     CATEGORIES = "categories",
     ORDERS = "orders",
+    CREW_MEMBERS = "crew_members",
 }
 
 export class MongoDB {
@@ -48,15 +49,6 @@ export class MongoDB {
                 await this.db.createCollection(collection as string);
                 console.log(`Created ${collection} collection`);
             }
-        }
-
-        // Ensure orders collection exists
-        const ordersCollectionExists = await this.db
-            .listCollections({name: "orders"})
-            .hasNext();
-        if (!ordersCollectionExists) {
-            await this.db.createCollection("orders");
-            console.log("Created orders collection");
         }
     }
 
