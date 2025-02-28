@@ -19,7 +19,6 @@ export async function createUser(uname: string, email: string, pw: string, zonal
     try {
         const newUser = new CREW_MEMBER({uname, email, pw, zonalAccess, stockOnAccess});
         await newUser.save();
-        console.log("User created:", newUser);
         return true;
     } catch (error: any) {
         if (error.code === 11000) {
