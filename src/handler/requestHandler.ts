@@ -1,6 +1,7 @@
 import { Router } from "../http/router.ts";
 import workOn from "../workspace/workon/requestHandler.ts";
 import stockOn from "../workspace/stockon/requestHandler.ts";
+import zoneHandler from "../workspace/zone/requestHandler.ts";
 import { notFound } from "../http/responseTemplates.ts";
 import { RequestType } from "../http/requestType.ts";
 import {
@@ -8,9 +9,9 @@ import {
   SignInHandler,
   SignUpHandler,
 } from "../auth/handler.ts";
-import type MongoDB from "../db/mongoDB.ts";
+import {Zone} from "./utils.ts";
 
-const router = new Router();
+const router = new Router(Zone.Root);
 
 router
   // TODO: properly document usage
@@ -27,7 +28,8 @@ router
     description: "Handles all requests for WorkOn",
     usage: "Route must start with /workon",
   })
-  .match("/stockon", stockOn.handle) // TODO: uncomment when we add impl for stockon
+  .match("/stockon", stockOn.handle)
+  .match("/zones", zoneHandler.handle)
   .finish(notFound());
 
 export default {

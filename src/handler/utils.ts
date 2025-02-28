@@ -79,3 +79,18 @@ export interface OrderDetails {
   quantity: number;
   hash?: string;
 }
+
+// Should be used for Zonal access.
+export enum Zone {
+  Root= "Root",
+  WorkOn = "WorkOn",
+  StockOn = "StockOn",
+}
+
+// Should be used to verify user access to the categories.
+export enum StockOnCategories {
+  Biscotti,
+  Stacks,
+  Outpost,
+  Provisions,
+}
