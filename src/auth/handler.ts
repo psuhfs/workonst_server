@@ -7,10 +7,19 @@ import {
 } from "../http/responseTemplates.ts";
 import jwt from "jsonwebtoken";
 import type {Token} from "./model.ts";
-import {prisma} from "../handler/db.ts";
 import {sha256Hash} from "./hasher.ts";
 import type {RequestHandler} from "../http/traits.ts";
 import {extractTokenDetails, extractTokenFromHeaders} from "./token_extractor.ts";
+import {createUser, getUserByUsername, modifyAccess} from "../dbUtils/user_schema.ts";
+import {Zone} from "../handler/utils.ts";
+
+interface SignupDetails {
+    username: string;
+    password: string;
+    emailid?: string;
+    zonalAccess: [string],
+    stockonAccess: [string],
+}
 
 interface AuthModel {
     username: string;
@@ -19,19 +28,25 @@ interface AuthModel {
 }
 
 // TODO: should maintain a map
-export async function handleAuth(req: Request): Promise<CustomResponse> {
+export async function handleAuth(req: Request, zone: Zone): Promise<CustomResponse> {
     try {
         let token = extractTokenFromHeaders(req.headers);
         if (!token) {
             return unauthorized("No token provided.");
         }
-        let authResp = await processAuth(
-            {token},
-            req.headers.get("Origin"),
-        );
-        if (!authResp.getResponse().ok) {
-            return authResp;
+        let details = extractTokenDetails({token});
+        if (!details) {
+            return unauthorized();
         }
+
+        let user = await getUserByUsername(details["username"], details["pw"]);
+        if (!user) {
+            return unauthorized();
+        }
+        if (!user.zonalAccess.find((v: string) => v === zone.toString())) {
+            return unauthorized();
+        }
+
         return successHeaders(
             {message: "Auth Successful."},
             {"Access-Control-Allow-Origin": `${req.headers.get("Origin")}`},
@@ -58,11 +73,12 @@ export class SignUpHandler implements RequestHandler {
     async handle(
         req: Request,
         _params: Record<string, string>,
+        _zone: Zone,
     ): Promise<CustomResponse> {
         return handleAuthSignup(req);
     }
 
-    async auth(req: Request): Promise<CustomResponse> {
+    async auth(req: Request, zone: Zone): Promise<CustomResponse> {
         return success("Blah", req.headers.get("Origin"));
     }
 }
@@ -71,8 +87,9 @@ export class IsAuthenticatedHandler implements RequestHandler {
     async handle(
         req: Request,
         _params: Record<string, string>,
+        zone: Zone,
     ): Promise<CustomResponse> {
-        let resp = await handleAuth(req);
+        let resp = await handleAuth(req, zone);
         let origin = req.headers.get("Origin");
         origin = origin ? origin : "*";
         resp.getResponse().headers.set("access-control-allow-origin", origin);
@@ -80,7 +97,7 @@ export class IsAuthenticatedHandler implements RequestHandler {
         return resp;
     }
 
-    async auth(req: Request): Promise<CustomResponse> {
+    async auth(req: Request, _zone: Zone): Promise<CustomResponse> {
         return success("Blah", req.headers.get("Origin"));
     }
 }
@@ -89,18 +106,19 @@ export class SignInHandler implements RequestHandler {
     async handle(
         req: Request,
         _params: Record<string, string>,
+        _zone: Zone,
     ): Promise<CustomResponse> {
         return handleAuthSignin(req);
     }
 
-    async auth(req: Request): Promise<CustomResponse> {
+    async auth(req: Request, _zone: Zone): Promise<CustomResponse> {
         return success("Blah", req.headers.get("Origin"));
     }
 }
 
 export async function handleAuthSignup(req: Request): Promise<CustomResponse> {
     try {
-        let body: AuthModel = await req.json();
+        let body: SignupDetails = await req.json();
         let token = extractTokenFromHeaders(req.headers);
         if (token === null) {
             return unauthorized("No token provided.");
@@ -135,15 +153,8 @@ async function processAuthSignin(
     origin: string | null,
 ): Promise<CustomResponse> {
     body.password = sha256Hash(body.password);
-
-    let val = await prisma.crew_leaders.findUnique({
-        where: {
-            username: body.username,
-            password: body.password,
-        },
-    });
-
-    if (val === null) {
+    let val = await getUserByUsername(body.username, body.password);
+    if (val === undefined) {
         return unauthorized("Invalid username or password.");
     }
 
@@ -160,7 +171,7 @@ async function processAuthSignin(
 }
 
 async function processAuthSignup(
-    body: AuthModel,
+    body: SignupDetails,
     origin: string | null,
     token: Token,
 ): Promise<CustomResponse> {
@@ -169,26 +180,28 @@ async function processAuthSignup(
     if (details === undefined) {
         return unauthorized("Invalid signup details.");
     }
-    let referer: string = details["username"];
-    let val = await prisma.crew_leaders.findUnique({
-        where: {
-            username: referer,
-        },
-    });
-
+    let val = await getUserByUsername(details["username"], details["pw"]);
     if (val === null) {
         return unauthorized("Invalid signup details.");
     }
 
-    await prisma.crew_leaders.create({
-        data: {
-            username: body.username,
-            password: sha256Hash(body.password),
-            emailid: body.emailid
-                ? body.emailid
-                : `${body.username}@psu.edu`,
-        },
-    });
+    let za: [string] = val.zonalAccess;
+    if (za.find((v) => v.toLowerCase() == Zone.SignUp.toLowerCase()) === undefined) {
+        return unauthorized("You do not have permission to signup users.");
+    }
+
+    body.zonalAccess.push(Zone.Root);
+    if (body.stockonAccess.length > 0) {
+        body.zonalAccess.push(Zone.StockOn);
+    }
+
+    let inserted = await createUser(body.username, body.emailid
+        ? body.emailid
+        : `${body.username}@psu.edu`, sha256Hash(body.password), body.zonalAccess, body.stockonAccess);
+
+    if (!inserted) {
+        return internalServerError("Unable to create user. (Probably user already exists)");
+    }
 
     return success({message: "Signup successful."}, origin);
 }

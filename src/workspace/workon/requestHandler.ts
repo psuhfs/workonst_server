@@ -2,8 +2,9 @@ import { Router } from "../../http/router.ts";
 import { RequestType } from "../../http/requestType.ts";
 import { GetEmployee, GetEmployees } from "./getHandlers.ts";
 import { IncrHandler, ShiftHandler, ShiftsHandler } from "./postHandlers.ts";
+import {Zone} from "../../handler/utils.ts";
 
-const router = new Router("/workon");
+const router = new Router(Zone.WorkOn, "/workon");
 
 router
   .add(RequestType.GET, "/employees", new GetEmployees(), {

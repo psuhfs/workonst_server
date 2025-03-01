@@ -2,9 +2,9 @@ import { Router } from "../../http/router.ts";
 import { RequestType } from "../../http/requestType.ts";
 import { StockEmailSender } from "./postHandlers.ts";
 import { GetItems } from "./getHandlers.ts";
-import type MongoDB from "../../db/mongoDB.ts";
+import {Zone} from "../../handler/utils.ts";
 
-const router = new Router("/stockon");
+const router = new Router(Zone.StockOn, "/stockon");
 
 router
   .add(RequestType.GET, "/getItems", new GetItems(), {

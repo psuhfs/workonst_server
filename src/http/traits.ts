@@ -1,10 +1,11 @@
 import type { CustomResponse } from "./response.ts";
-import type MongoDB from "../db/mongoDB.ts";
+import type {Zone} from "../handler/utils.ts";
 
 export interface RequestHandler {
   handle: (
     req: Request,
     params: Record<string, string>,
+    zone: Zone,
   ) => Promise<CustomResponse>;
-  auth: (req: Request) => Promise<CustomResponse>;
+  auth: (req: Request, zone: Zone) => Promise<CustomResponse>;
 }
