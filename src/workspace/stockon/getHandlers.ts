@@ -1,35 +1,55 @@
-import {internalServerError, success} from "../../http/responseTemplates.ts";
+import {internalServerError, success, unauthorized} from "../../http/responseTemplates.ts";
 import type {CustomResponse} from "../../http/response.ts";
 import type {RequestHandler} from "../../http/traits.ts";
-import {handleAuth} from "../../auth/handler.ts";
-import {getItemsCache} from "../../cache/cache.ts";
-import {Zone} from "../../handler/utils.ts";
+import {extractTokenDetails, extractTokenFromHeaders} from "../../auth/token_extractor.ts";
+import {getUserByUsername} from "../../dbUtils/user_schema.ts";
 
 export class GetItems implements RequestHandler {
     async handle(req: Request): Promise<CustomResponse> {
         return this.handleGetItems(req);
     }
 
-    async auth(req: Request, zone: Zone): Promise<CustomResponse> {
-        return handleAuth(req, zone);
+    async auth(req: Request): Promise<CustomResponse> {
+        return success("Blah", req.headers.get("Origin"));
     }
 
     async handleGetItems(req: Request): Promise<CustomResponse> {
         try {
-            let items: any | undefined = getItemsCache.get("items");
-            if (items !== undefined) {
-                console.log("Cache hit");
-                return success(items, req.headers.get("Origin"));
+            let token = extractTokenFromHeaders(req.headers);
+            if (!token) {
+                return unauthorized("No token provided.");
             }
-            console.log("Cache miss");
+            let details = extractTokenDetails({token});
+            if (!details) {
+                return unauthorized();
+            }
+
+            let user = await getUserByUsername(details["username"], details["pw"]);
+            if (!user) {
+                return unauthorized();
+            }
+
             const read = Bun.file("categories_schema.json");
             let json = await read.json();
-            getItemsCache.set("items", json);
-            return success(json, req.headers.get("Origin"));
+            let filtered = this.filterObjectKeys(json, user.stockOnAccess);
+
+            return success(filtered, req.headers.get("Origin"));
         } catch (e) {
             return internalServerError(
                 `An error occurred while trying to get items: ${e}`,
             );
         }
+    }
+
+    filterObjectKeys(obj: any, keysToRemove: string[]): any {
+        const result: any = {};
+
+        for (const key in obj) {
+            if (!obj.hasOwnProperty(key) || keysToRemove.includes(key)) {
+                result[key] = obj[key];
+            }
+        }
+
+        return result;
     }
 }
