@@ -9,15 +9,16 @@ await mongoose.connect(uri ? uri : "", {
 const crewMemberSchema = new mongoose.Schema({
     uname: {type: String, required: true, unique: true},
     pw: {type: String, required: true},
+    referer: {type: String},
     email: {type: String},
     zonalAccess: {type: [String], required: true},
     stockOnAccess: {type: [String], required: true},
 }, {timestamps: true});
 
 
-export async function createUser(uname: string, email: string, pw: string, zonalAccess: string[], stockOnAccess: string[]): Promise<boolean> {
+export async function createUser(referer: string, uname: string, email: string, pw: string, zonalAccess: string[], stockOnAccess: string[]): Promise<boolean> {
     try {
-        const newUser = new CREW_MEMBER({uname, email, pw, zonalAccess, stockOnAccess});
+        const newUser = new CREW_MEMBER({referer, uname, email, pw, zonalAccess, stockOnAccess});
         await newUser.save();
         return true;
     } catch (error: any) {
@@ -41,7 +42,7 @@ export async function getUserByUsername(uname: string, pw: string): Promise<any 
 export async function modifyPassword(uname: string, oldPw: string, newPw: string): Promise<boolean> {
     try {
         // Find the user by username and old password
-        const user = await CREW_MEMBER.findOne({ uname, pw: oldPw });
+        const user = await CREW_MEMBER.findOne({uname, pw: oldPw});
 
         if (!user) {
             return false; // User not found or incorrect password
@@ -63,7 +64,7 @@ export async function modifyPassword(uname: string, oldPw: string, newPw: string
 export async function modifyAccess(uname: string, zonalAccess: string[], stockOnAccess: string[]): Promise<boolean> {
     try {
         // Find the user by username and old password
-        const user = await CREW_MEMBER.findOne({ uname });
+        const user = await CREW_MEMBER.findOne({uname});
 
         if (!user) {
             return false; // User not found

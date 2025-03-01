@@ -195,7 +195,7 @@ async function processAuthSignup(
         body.zonalAccess.push(Zone.StockOn);
     }
 
-    let inserted = await createUser(body.username, body.emailid
+    let inserted = await createUser(details["username"], body.username, body.emailid
         ? body.emailid
         : `${body.username}@psu.edu`, sha256Hash(body.password), body.zonalAccess, body.stockonAccess);
 
