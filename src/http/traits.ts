@@ -1,5 +1,4 @@
 import type { CustomResponse } from "./response.ts";
-import type MongoDB from "../db/mongoDB.ts";
 
 export interface RequestHandler {
   handle: (

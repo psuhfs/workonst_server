@@ -95,3 +95,12 @@ export enum StockOnCategories {
   Outpost = "Outpost",
   Provisions = "Provisions",
 }
+
+export const enum DBCollection {
+  STOCKON = "stockon",
+}
+
+export const enum Collections {
+  ORDERS = "orders",
+  CREW_MEMBERS = "crew_members",
+}

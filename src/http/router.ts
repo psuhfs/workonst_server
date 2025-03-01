@@ -2,7 +2,6 @@ import {fromString, type RequestType} from "./requestType.ts";
 import {invalidRequest, notFound, success} from "./responseTemplates.ts";
 import {CustomResponse} from "./response.ts";
 import type {RequestHandler} from "./traits.ts";
-import type MongoDB from "../db/mongoDB.ts";
 import {Zone} from "../handler/utils.ts";
 
 type Handler = (

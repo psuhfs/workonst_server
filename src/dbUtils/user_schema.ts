@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import {Collections, DBCollection} from "../db/mongoDB.ts";
+import {Collections, DBCollection} from "../handler/utils.ts";
 
 const uri = process.env.MONGO_URI;
 await mongoose.connect(uri ? uri : "", {

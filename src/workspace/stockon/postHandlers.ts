@@ -5,7 +5,6 @@ import {Email} from "../../handler/email.ts";
 import {generateCsvFromItems} from "./generateOrderFile.ts";
 import type {RequestHandler} from "../../http/traits.ts";
 import {handleAuth,} from "../../auth/handler.ts";
-import {Collections, DBCollection, MongoDB} from "../../db/mongoDB.ts";
 import {DateTime} from "luxon";
 import {extractTokenDetails, extractTokenFromHeaders} from "../../auth/token_extractor.ts";
 import {managerEmail} from "../../wellknown/emails.ts";
