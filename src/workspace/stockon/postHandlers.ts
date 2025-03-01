@@ -1,6 +1,6 @@
 import {internalServerError, invalidRequest, success, unauthorized,} from "../../http/responseTemplates.ts";
 import type {CustomResponse} from "../../http/response.ts";
-import {type OrderDetails} from "../../handler/utils.ts";
+import {type OrderDetails, Zone} from "../../handler/utils.ts";
 import {Email} from "../../handler/email.ts";
 import {generateCsvFromItems} from "./generateOrderFile.ts";
 import type {RequestHandler} from "../../http/traits.ts";
@@ -20,8 +20,8 @@ export class StockEmailSender implements RequestHandler {
         return this.handleSendEmail(req);
     }
 
-    async auth(req: Request): Promise<CustomResponse> {
-        return handleAuth(req);
+    async auth(req: Request, zone: Zone): Promise<CustomResponse> {
+        return handleAuth(req, zone);
     }
 
     async handleSendEmail(req: Request): Promise<CustomResponse> {
@@ -140,8 +140,8 @@ export class StockEditItems implements RequestHandler {
         return this.handleEditItems(req);
     }
 
-    async auth(req: Request): Promise<CustomResponse> {
-        return handleAuth(req);
+    async auth(req: Request, zone: Zone): Promise<CustomResponse> {
+        return handleAuth(req, zone);
     }
 
     async handleEditItems(req: Request): Promise<CustomResponse> {

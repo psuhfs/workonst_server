@@ -22,7 +22,7 @@ router
     description: "Helps to signin.",
   })
   .add(RequestType.GET, "/auth/authenticated", new IsAuthenticatedHandler(), {
-    description: "Checks if user is authenticated.",
+    description: "Checks if user is authenticated (token is valid).",
   })
   .match("/workon", workOn.handle, {
     description: "Handles all requests for WorkOn",

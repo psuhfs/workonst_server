@@ -158,11 +158,11 @@ export class Router {
         for (const [route, handler] of methodRoutes) {
             const match = this.matchRoute(path, route);
             if (match) {
-                let auth = await handler.auth(req);
+                let auth = await handler.auth(req, this.zone);
                 if (auth.isErr()) {
                     return auth;
                 }
-                return handler.handle(req, match);
+                return handler.handle(req, match, this.zone);
             } else {
                 console.log("No match for", path, route);
             }
@@ -174,11 +174,11 @@ export class Router {
     private async handleMatch(req: Request, url: URL): Promise<CustomResponse> {
         for (const match of this.matches) {
             if (url.pathname.startsWith(match.prefix)) {
-                let auth = await match.handler.auth(req);
+                let auth = await match.handler.auth(req, this.zone);
                 if (auth.isErr()) {
                     return auth;
                 }
-                return match.handler.handle(req, {});
+                return match.handler.handle(req, {}, this.zone);
             }
         }
 

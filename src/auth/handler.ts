@@ -28,19 +28,25 @@ interface AuthModel {
 }
 
 // TODO: should maintain a map
-export async function handleAuth(req: Request): Promise<CustomResponse> {
+export async function handleAuth(req: Request, zone: Zone): Promise<CustomResponse> {
     try {
         let token = extractTokenFromHeaders(req.headers);
         if (!token) {
             return unauthorized("No token provided.");
         }
-        let authResp = await processAuth(
-            {token},
-            req.headers.get("Origin"),
-        );
-        if (!authResp.getResponse().ok) {
-            return authResp;
+        let details = extractTokenDetails({token});
+        if (!details) {
+            return unauthorized();
         }
+
+        let user = await getUserByUsername(details["username"], details["pw"]);
+        if (!user) {
+            return unauthorized();
+        }
+        if (!user.zonalAccess.find((v: string) => v === zone.toString())) {
+            return unauthorized();
+        }
+
         return successHeaders(
             {message: "Auth Successful."},
             {"Access-Control-Allow-Origin": `${req.headers.get("Origin")}`},
@@ -67,11 +73,12 @@ export class SignUpHandler implements RequestHandler {
     async handle(
         req: Request,
         _params: Record<string, string>,
+        _zone: Zone,
     ): Promise<CustomResponse> {
         return handleAuthSignup(req);
     }
 
-    async auth(req: Request): Promise<CustomResponse> {
+    async auth(req: Request, zone: Zone): Promise<CustomResponse> {
         return success("Blah", req.headers.get("Origin"));
     }
 }
@@ -80,8 +87,9 @@ export class IsAuthenticatedHandler implements RequestHandler {
     async handle(
         req: Request,
         _params: Record<string, string>,
+        zone: Zone,
     ): Promise<CustomResponse> {
-        let resp = await handleAuth(req);
+        let resp = await handleAuth(req, zone);
         let origin = req.headers.get("Origin");
         origin = origin ? origin : "*";
         resp.getResponse().headers.set("access-control-allow-origin", origin);
@@ -89,7 +97,7 @@ export class IsAuthenticatedHandler implements RequestHandler {
         return resp;
     }
 
-    async auth(req: Request): Promise<CustomResponse> {
+    async auth(req: Request, _zone: Zone): Promise<CustomResponse> {
         return success("Blah", req.headers.get("Origin"));
     }
 }
@@ -98,11 +106,12 @@ export class SignInHandler implements RequestHandler {
     async handle(
         req: Request,
         _params: Record<string, string>,
+        _zone: Zone,
     ): Promise<CustomResponse> {
         return handleAuthSignin(req);
     }
 
-    async auth(req: Request): Promise<CustomResponse> {
+    async auth(req: Request, _zone: Zone): Promise<CustomResponse> {
         return success("Blah", req.headers.get("Origin"));
     }
 }
@@ -188,7 +197,7 @@ async function processAuthSignup(
 
     let inserted = await createUser(body.username, body.emailid
         ? body.emailid
-        : `${body.username}@psu.edu`, body.password, body.zonalAccess, body.stockonAccess);
+        : `${body.username}@psu.edu`, sha256Hash(body.password), body.zonalAccess, body.stockonAccess);
 
     if (!inserted) {
         return internalServerError("Unable to create user. (Probably user already exists)");
