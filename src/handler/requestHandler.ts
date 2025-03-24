@@ -10,6 +10,7 @@ import {
   SignUpHandler,
 } from "../auth/handler.ts";
 import {Zone} from "./utils.ts";
+import {HealthCheck} from "../healthCheck.ts";
 
 const router = new Router(Zone.Root);
 
@@ -24,6 +25,7 @@ router
   .add(RequestType.GET, "/auth/authenticated", new IsAuthenticatedHandler(), {
     description: "Checks if user is authenticated (token is valid).",
   })
+    .add(RequestType.GET, "/health", new HealthCheck())
   .match("/workon", workOn.handle, {
     description: "Handles all requests for WorkOn",
     usage: "Route must start with /workon",
