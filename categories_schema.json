@@ -2522,37 +2522,37 @@
             {
               "item_id": "4417",
               "name": "WHOLE MILK - CHUG",
-              "unit_sz": "18/CS"
+              "unit_sz": "16/CS"
             },
             {
               "item_id": "4418",
               "name": "SKIM - CHUG",
-              "unit_sz": "18/CS"
+              "unit_sz": "16/CS"
             },
             {
               "item_id": "4419",
               "name": "CHOCOLATE MILK - CHUG",
-              "unit_sz": "18/CS"
+              "unit_sz": "16/CS"
             },
             {
               "item_id": "4427",
               "name": "MILK 2% CHUG",
-              "unit_sz": "18/CS"
+              "unit_sz": "16/CS"
             },
             {
               "item_id": "4842",
               "name": "PROTEIN SHAKE - CHOCOLATE",
-              "unit_sz": "18/CS"
+              "unit_sz": "16/CS"
             },
             {
               "item_id": "4846",
               "name": "PROTEIN SHAKE - STRAWBERRY",
-              "unit_sz": "18/CS"
+              "unit_sz": "16/CS"
             },
             {
               "item_id": "5009",
               "name": "DR BOBS YOGURT SMOOTHIE STRAWBERRY",
-              "unit_sz": "18/CS"
+              "unit_sz": "16/CS"
             },
             {
               "item_id": "1573",
@@ -2562,7 +2562,7 @@
             {
               "item_id": "1589",
               "name": "ORANGE JUICE - CHUG",
-              "unit_sz": "18/CS"
+              "unit_sz": "16/CS"
             },
             {
               "item_id": "1384",
@@ -2572,7 +2572,7 @@
             {
               "item_id": "1758",
               "name": "LEMONADE - CHUG",
-              "unit_sz": "18/CS"
+              "unit_sz": "16/CS"
             },
             {
               "item_id": "1006",
@@ -2582,32 +2582,32 @@
             {
               "item_id": "1641",
               "name": "ICED TEA - CHUG",
-              "unit_sz": "18/CS"
+              "unit_sz": "16/CS"
             },
             {
               "item_id": "3321",
               "name": "ICED TEA PEACH - CHUG",
-              "unit_sz": "18/CS"
+              "unit_sz": "16/CS"
             },
             {
               "item_id": "1678",
               "name": "ICED TEA GREEN - CHUG",
-              "unit_sz": "18/CS"
+              "unit_sz": "16/CS"
             },
             {
               "item_id": "3320",
               "name": "ICED TEA RASPBERRY - CHUG",
-              "unit_sz": "18/CS"
+              "unit_sz": "16/CS"
             },
             {
               "item_id": "7066",
               "name": "ICED COFFEE - CHUG",
-              "unit_sz": "18/CS"
+              "unit_sz": "16/CS"
             },
             {
               "item_id": "7001",
               "name": "ICED MOCHA - CHUG",
-              "unit_sz": "18/CS"
+              "unit_sz": "16/CS"
             }
           ],
           "CREAMERY - ICE CREAM": [
@@ -3061,6 +3061,11 @@
         "info": {
           "WALK-IN PRODUCE (FRESH CUT)": [
             {
+              "item_id": "0920",
+              "name": "Quartered Yukon Gold Potato",
+                "unit_sz": "LB"
+            },
+            {
               "item_id": "0683",
               "name": "PRD VEG CUCUMBER ENGLISH",
               "unit_sz": "PAK6"
@@ -3250,7 +3255,7 @@
             {
               "item_id": "4597",
               "name": "PRD VEG GARLIC PLD",
-              "unit_sz": "LB"
+              "unit_sz": "5 LB/Jar"
             },
             {
               "item_id": "0872",
@@ -3260,7 +3265,7 @@
             {
               "item_id": "0840",
               "name": "PRD VEG ONION SPANISH",
-              "unit_sz": "LB"
+              "unit_sz": "50 LB bag"
             },
             {
               "item_id": "1629",
@@ -3305,7 +3310,7 @@
             {
               "item_id": "0850",
               "name": "PRD BANANAS",
-              "unit_sz": "40 LB"
+              "unit_sz": "40 LB/case"
             },
             {
               "item_id": "0902",
