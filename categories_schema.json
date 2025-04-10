@@ -2502,7 +2502,7 @@
             {
               "item_id": "0466",
               "name": "CHEESE RICOTTA 10 LB",
-              "unit_sz": "LB"
+              "unit_sz": "10 LB/tub"
             },
             {
               "item_id": "0753",
@@ -4872,7 +4872,7 @@
             {
               "item_id": "0466",
               "name": "CHEESE RICOTTA 10 LB",
-              "unit_sz": "LB"
+              "unit_sz": "10 LB/tub"
             },
             {
               "item_id": "4007",
