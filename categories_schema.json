@@ -3078,7 +3078,7 @@
             {
               "item_id": "0938",
               "name": "Diced Sweet Potato",
-              "unit_sz": "5 LB"
+              "unit_sz": "LB"
             },
             {
               "item_id": "0853",
@@ -3153,7 +3153,7 @@
             {
               "item_id": "3582",
               "name": "PRD VP SALAD MIX SPRING",
-              "unit_sz": "CASE"
+              "unit_sz": "LB"
             },
             {
               "item_id": "0634",
@@ -3220,7 +3220,7 @@
             {
               "item_id": "0857",
               "name": "PRD FRU ORANGE 88CT",
-              "unit_sz": "EACH"
+              "unit_sz": "CASE/88 CT"
             },
             {
               "item_id": "4874",
@@ -4852,6 +4852,132 @@
               "name": "PRD VEG TOMATO ROMA",
               "unit_sz": "LB"
             }
+          ]
+        }
+      },
+      {
+        "name": "Cow & Cookie",
+        "info": {
+          "WALK-IN (CREAMERY)": [
+            {
+              "item_id": "1523",
+              "name": "ICE CREAM MIX CRMRY VAN SOFT SERVE",
+              "unit_sz": "crate"
+            },
+            {
+              "item_id": "1524",
+              "name": "ICE CREAM MIX CRMRY CHOC SOFT SERVE",
+              "unit_sz": "crate"
+            }
+          ],
+          "BAKERY": [
+            {
+              "item_id": "2163",
+              "name": "BKY SQ 1/2SH BROOKIE JACKSON",
+              "unit_sz": "1/2 SH"
+            },
+            {
+              "item_id": "2051",
+              "name": "BKY SQ 1/2SH CHSCAKE NY",
+              "unit_sz": "1/2 SH"
+            },
+            {
+              "item_id": "2141",
+              "name": "BKY SQ 1/2SH BROWN NO NUT",
+              "unit_sz": "1/2 SH"
+            },
+            {
+              "item_id": "0478",
+              "name": "BAKEA NUT PEANUT CHOPPED",
+              "unit_sz": "30lb/case"
+            },
+            {
+              "item_id": "1633",
+              "name": "BAKEB CHOC DROPS 10000CT",
+              "unit_sz": "LB"
+            }
+          ],
+          "WAREHOUSE": [
+            {
+              "item_id": "3259",
+              "name": "CUP PAPER SQUAT  12 OZ (PLAIN)",
+              "unit_sz": "500/case"
+            },
+            {
+              "item_id": "3779",
+              "name": "CUP PAPER SQUAT 16 OZ (CUSTOM PRINT)",
+              "unit_sz": "500/case"
+            },
+            {
+              "item_id": "3771",
+              "name": "LID CUP SQUAT 12 & 16 OZ",
+              "unit_sz": "500/case"
+            },
+            {
+              "item_id": "3239",
+              "name": "FLATWARE PLSTC PARFAIT SPOOON",
+              "unit_sz": "case"
+            },
+            {
+              "item_id": "0482",
+              "name": "FRU FZN BLUEBERRY KOSHER",
+              "unit_sz": "30LB/CS"
+            },
+            {
+              "item_id": "7060",
+              "name": "FRU FZN STRAWBERRY IQF (S/0)",
+              "unit_sz": "10LB/CS"
+            },
+            {
+              "item_id": "0576",
+              "name": "CRM WHIPPING LT AEROSOL",
+              "unit_sz": "CASE"
+            },
+            {
+              "item_id": "1222",
+              "name": "COOKIE OREO BULK",
+              "unit_sz": "CASE"
+            },
+            {
+              "item_id": "1476",
+              "name": "TOPPING BUTTERFINGER",
+              "unit_sz": "10LB/CS"
+            },
+            {
+              "item_id": "4008",
+              "name": "TOPPING REESES PIECES",
+              "unit_sz": "25LB/CS"
+            },
+            {
+              "item_id": "2850",
+              "name": "CNDY M&M BULK PLAIN",
+              "unit_sz": "25LB/CS"
+            },
+            {
+              "item_id": "0476",
+              "name": "NUT COCONUT SNOWFLAKE",
+              "unit_sz": "25LB/CS"
+            },
+            {
+              "item_id": "2517",
+              "name": "TOPPING SYRUP CARAMEL",
+              "unit_sz": "4/case"
+            },
+            {
+              "item_id": "3772",
+              "name": "PRETZEL TINY TWIST BULK",
+              "unit_sz": "6LB/CASE"
+            },
+            {
+              "item_id": "4040",
+              "name": "GUMMY BEARS",
+              "unit_sz": "20LB/CS"
+            },
+            {
+              "item_id": "4463",
+              "name": "CLNR SANITIZER SOFT SERVE",
+              "unit_sz": "CASE"
+            },
           ]
         }
       },
