@@ -3061,6 +3061,11 @@
         "info": {
           "WALK-IN PRODUCE (FRESH CUT)": [
             {
+              "item_id": "6397",
+              "name": "Pineapple Diced",
+                "unit_sz": "LB"
+            },
+            {
               "item_id": "0920",
               "name": "Quartered Yukon Gold Potato",
                 "unit_sz": "LB"
