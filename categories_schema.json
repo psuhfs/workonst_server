@@ -4895,6 +4895,16 @@
               "item_id": "1633",
               "name": "BAKEB CHOC DROPS 10000CT",
               "unit_sz": "LB"
+            },
+            {
+              "item_id": "1883",
+              "name": "SPRINKLES - BLUE",
+              "unit_sz": "6LB/CASE"
+            },
+            {
+              "item_id": "0760",
+              "name": "SPRINKLES - WHITE",
+              "unit_sz": "6LB/CASE"
             }
           ],
           "WAREHOUSE": [
@@ -4977,7 +4987,7 @@
               "item_id": "4463",
               "name": "CLNR SANITIZER SOFT SERVE",
               "unit_sz": "CASE"
-            },
+            }
           ]
         }
       },
