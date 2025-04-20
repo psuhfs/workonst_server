@@ -85,7 +85,7 @@ export enum Zone {
   Root= "Root",
   WorkOn = "WorkOn",
   StockOn = "StockOn",
-  SignUp = "SignUp",
+  Admin = "Admin",
 }
 
 // Should be used to verify user access to the categories.

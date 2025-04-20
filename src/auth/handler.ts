@@ -186,7 +186,7 @@ async function processAuthSignup(
     }
 
     let za: [string] = val.zonalAccess;
-    if (za.find((v) => v.toLowerCase() == Zone.SignUp.toLowerCase()) === undefined) {
+    if (za.find((v) => v.toLowerCase() == Zone.Admin.toLowerCase()) === undefined) {
         return unauthorized("You do not have permission to signup users.");
     }
 

@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import {Collections, DBCollection} from "../handler/utils.ts";
+import {Collections, DBCollection, StockOnCategories, Zone} from "../handler/utils.ts";
 
 const uri = process.env.MONGO_URI;
 await mongoose.connect(uri ? uri : "", {
@@ -11,8 +11,8 @@ const crewMemberSchema = new mongoose.Schema({
     pw: {type: String, required: true},
     referer: {type: String},
     email: {type: String},
-    zonalAccess: {type: [String], required: true},
-    stockOnAccess: {type: [String], required: true},
+    zonalAccess: {type: [String], required: true, enum: Object.values(Zone),},
+    stockOnAccess: {type: [String], required: true, enum: Object.values(StockOnCategories)},
 }, {timestamps: true});
 
 
