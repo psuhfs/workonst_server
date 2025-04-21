@@ -11,7 +11,6 @@ export interface PointsDetails {
   employeeId?: string;
   shiftDate: string;
   selectedShift: string;
-  manualShift?: string;
   reason: string;
   comments?: string;
   email: string;
