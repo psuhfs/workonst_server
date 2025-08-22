@@ -3061,6 +3061,11 @@
         "info": {
           "WALK-IN PRODUCE (FRESH CUT)": [
             {
+              "item_id": "0873",
+              "name": " PRD VEG POT BAKING 70 CT",
+              "unit_sz": "BOX"
+            },
+            {
               "item_id": "6397",
               "name": "Pineapple Diced",
                 "unit_sz": "LB"
@@ -3078,7 +3083,7 @@
             {
               "item_id": "4069",
               "name": "Leeks",
-              "unit_sz": "5 LB"
+              "unit_sz": "LB"
             },
             {
               "item_id": "0938",
