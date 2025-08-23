@@ -3061,6 +3061,16 @@
         "info": {
           "WALK-IN PRODUCE (FRESH CUT)": [
             {
+              "item_id": "3971",
+              "name": "PRD VP FRU SALSA MANGO",
+              "unit_sz": "5LB/CNTR"
+            },
+            {
+              "item_id": "0723",
+              "name": "PRD VP COLLARD CHPD 1",
+              "unit_sz": "LB"
+            },
+            {
               "item_id": "0873",
               "name": " PRD VEG POT BAKING 70 CT",
               "unit_sz": "BOX"
@@ -3217,6 +3227,11 @@
             }
           ],
           "WALK-IN PRODUCE": [
+            {
+              "item_id": "3979",
+              "name": "MUSHROOM CRIMINI ",
+              "unit_sz": "LB"
+            },
             {
               "item_id": "3538",
               "name": "PRD FRU APPL GALA 125 CT",
