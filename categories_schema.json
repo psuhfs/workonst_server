@@ -3078,27 +3078,42 @@
             {
               "item_id": "6397",
               "name": "Pineapple Diced",
-                "unit_sz": "LB"
+              "unit_sz": "LB"
             },
             {
               "item_id": "0920",
               "name": "Quartered Yukon Gold Potato",
-                "unit_sz": "LB"
+              "unit_sz": "LB"
             },
             {
               "item_id": "0052",
               "name": "PRD HERB DILL",
-                "unit_sz": "LB"
+              "unit_sz": "LB"
             },
             {
               "item_id": "0810",
               "name": "PRD VP CELERY STICK 3\"-5\"",
-                "unit_sz": "LB"
+              "unit_sz": "LB"
             },
             {
               "item_id": "0683",
               "name": "PRD VEG CUCUMBER ENGLISH",
               "unit_sz": "PAK6"
+            },
+            {
+              "item_id": "0044",
+              "name": "PRD VEG POT Yukon Gold",
+              "unit_sz": "LB"
+            },
+            {
+              "item_id": "0735",
+              "name": "Peppers Red dice 1/2\"",
+              "unit_sz": "LB"
+            },
+            {
+              "item_id": "0736",
+              "name": "Peppers Green diced 1/2\"",
+              "unit_sz": "LB"
             },
             {
               "item_id": "4069",
