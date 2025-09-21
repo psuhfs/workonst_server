@@ -11,6 +11,7 @@ const orderSchema = new mongoose.Schema({
     uname: {type: String, required: true},
     email_recipients: {type: String, required: true},
     order_date: {type: String, required: true},
+    order_delivery_date: {type: String, required: false},
     order_details: [{
         location: {type: String, required: true},
         area: {type: String, required: true},
@@ -22,9 +23,11 @@ const orderSchema = new mongoose.Schema({
     }]
 }, {timestamps: true});
 
-export async function order(uname: string, email_recipients: string, order_date: string, order_details: OrderDetails[]): Promise<boolean> {
+export const ORDER_SCHEMA = mongoose.model(Collections.ORDERS, orderSchema);
+
+export async function order(uname: string, email_recipients: string, order_date: string, order_delivery_date: string, order_details: OrderDetails[]): Promise<boolean> {
     try {
-        const newOrder = new ORDER_SCHEMA({uname, email_recipients, order_date, order_details});
+        const newOrder = new ORDER_SCHEMA({uname, email_recipients, order_date, order_delivery_date, order_details});
         await newOrder.save();
         return true;
     } catch (e: any) {
@@ -36,6 +39,5 @@ export async function order(uname: string, email_recipients: string, order_date:
 
         return false;
     }
-}
 
-export const ORDER_SCHEMA = mongoose.model(Collections.ORDERS, orderSchema);
+}

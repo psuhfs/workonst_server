@@ -26,8 +26,8 @@ export class StockEmailSender implements RequestHandler {
 
     async handleSendEmail(req: Request): Promise<CustomResponse> {
         try {
-            let body: [OrderDetails] = await req.json();
-            if (!verifyBody(body)) {
+            let body: { date: string; items: [OrderDetails] } = await req.json();
+            if (!verifyBody(body.items)) {
                 return invalidRequest(
                     req.url,
                     `Hash for some of the items did not match.`,
@@ -45,8 +45,8 @@ export class StockEmailSender implements RequestHandler {
                 .setZone("America/New_York")
                 .toFormat("yyyy-MM-dd HH:mm:ss ZZZZ");
 
-            const emailContent = generateEmailBody(body, access_code, curTime);
-            const csvFile = generateCsvFromItems(body);
+            const emailContent = generateEmailBody(body.date, body.items, access_code, curTime);
+            const csvFile = generateCsvFromItems(body.date, body.items);
 
             let ref_email = access_code.endsWith("@psu.edu")
                 ? access_code
@@ -69,12 +69,13 @@ export class StockEmailSender implements RequestHandler {
 
             let _ = await email.send();
 
-            let result = await order(access_code, emails, curTime.toString(), body);
+            let result = await order(access_code, emails, curTime.toString(), body.date, body.items);
             if (!result) {
                 await sendWebhookMessage({
                     access_code: access_code,
                     email_recipients: emails,
                     order_date: curTime.toString(),
+                    order_delivery_date: body.date,
                     orders: body,
                 });
             }
@@ -92,6 +93,7 @@ export class StockEmailSender implements RequestHandler {
 }
 
 function generateEmailBody(
+    order_delivery_date: string,
     data: [OrderDetails],
     accessCode: string,
     time: Date,
@@ -99,7 +101,8 @@ function generateEmailBody(
     let message = `Hello, <strong>${accessCode}</strong>,\n\n`;
     message +=
         "Please find the attached order data file and a summary table below:\n";
-    message += `<p><strong>Delivery Date</strong></p>: ${time}\n`;
+    message += `<p><strong>Order Date</strong></p>: ${time}\n`;
+    message += `<p><strong>Delivery Date</strong></p>: ${order_delivery_date}\n`;
 
     let tableRows = "";
     if (data.length > 0) {
