@@ -1,13 +1,15 @@
 import {createObjectCsvStringifier} from "csv-writer";
 import {type OrderDetails} from "../../handler/utils.ts";
 
-export function generateCsvFromItems(order_delivery_date: string, orderDetails: [OrderDetails]): string {
+export function generateCsvFromItems(
+    order_delivery_date: string,
+    orderDetails: OrderDetails[]
+): string {
     try {
         if (orderDetails.length === 0) {
             console.error("No items to write to CSV.");
             return "";
         }
-        let csvContent = `Order Delivery Date: ${order_delivery_date}\n\n`;
 
         const csvWriter = createObjectCsvStringifier({
             header: [
@@ -20,7 +22,13 @@ export function generateCsvFromItems(order_delivery_date: string, orderDetails: 
                 {id: "category", title: "Category"},
             ],
         });
-        return csvContent + csvWriter.stringifyRecords(orderDetails);
+
+        const dateRow = `Order Delivery Date:,${order_delivery_date}\n`;
+
+        const header = csvWriter.getHeaderString();
+        const records = csvWriter.stringifyRecords(orderDetails);
+
+        return dateRow + "\n" + header + records;
     } catch (error) {
         return "";
     }
