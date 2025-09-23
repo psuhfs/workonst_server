@@ -46,7 +46,7 @@ export class StockEmailSender implements RequestHandler {
                 .toFormat("yyyy-MM-dd HH:mm:ss ZZZZ");
 
             const emailContent = generateEmailBody(body.date, body.items, access_code, curTime);
-            const csvFile = generateCsvFromItems(body.date, body.items);
+            const csvFile = generateCsvFromItems(body.items);
 
             let ref_email = access_code.endsWith("@psu.edu")
                 ? access_code
@@ -102,7 +102,7 @@ function generateEmailBody(
     message +=
         "Please find the attached order data file and a summary table below:\n";
     message += `<p><strong>Order Date</strong></p>: ${time}\n`;
-    message += `<p><strong>Delivery Date</strong></p>: ${order_delivery_date}\n`;
+    message += `<p><strong>Delivery Date: ${order_delivery_date}</strong></p>\n`;
 
     let tableRows = "";
     if (data.length > 0) {
