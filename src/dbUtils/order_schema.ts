@@ -25,7 +25,7 @@ const orderSchema = new mongoose.Schema({
 
 export const ORDER_SCHEMA = mongoose.model(Collections.ORDERS, orderSchema);
 
-export async function order(uname: string, email_recipients: string, order_date: string, order_delivery_date: string, order_details: OrderDetails[]): Promise<boolean> {
+export async function order(uname: string, email_recipients: string, order_date: string, order_delivery_date: string, order_details: [OrderDetails]): Promise<boolean> {
     try {
         const newOrder = new ORDER_SCHEMA({uname, email_recipients, order_date, order_delivery_date, order_details});
         await newOrder.save();
