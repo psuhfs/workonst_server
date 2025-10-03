@@ -2747,11 +2747,6 @@
               "unit_sz": ""
             },
             {
-              "item_id": "52068",
-              "name": "CHOCOLATE MARSHMALLOW",
-              "unit_sz": ""
-            },
-            {
               "item_id": "7745",
               "name": "BTRSWT MINT",
               "unit_sz": ""
@@ -2802,11 +2797,6 @@
               "unit_sz": ""
             },
             {
-              "item_id": "6197",
-              "name": "STRAWBERRY",
-              "unit_sz": ""
-            },
-            {
               "item_id": "6198",
               "name": "MINT COOKIE",
               "unit_sz": ""
@@ -2824,17 +2814,17 @@
             {
               "item_id": "1660",
               "name": "STRAWBERRY 5.3 OZ",
-              "unit_sz": ""
+              "unit_sz": "72/cs"
             },
             {
               "item_id": "4305",
               "name": "PEACHY PATERNO 5.3 OZ",
-              "unit_sz": ""
+              "unit_sz": "72/cs"
             },
             {
               "item_id": "4299",
               "name": "CHOCOLATE 5.3 0Z",
-              "unit_sz": ""
+              "unit_sz": "72/cs"
             }
           ]
         }
@@ -6605,11 +6595,6 @@
               "unit_sz": ""
             },
             {
-              "item_id": "1685",
-              "name": "STRAWBERRY 1/2 GALLON",
-              "unit_sz": ""
-            },
-            {
               "item_id": "3182",
               "name": "WPSU COFFEE BREAK 1/2 GALLON",
               "unit_sz": ""
@@ -6714,12 +6699,12 @@
             {
               "item_id": "6195",
               "name": "VANILLA",
-              "unit_sz": ""
+              "unit_sz": "6/cs"
             },
             {
               "item_id": "6192",
               "name": "CHOCOLATE",
-              "unit_sz": ""
+              "unit_sz": "6/cs"
             },
             {
               "item_id": "",
