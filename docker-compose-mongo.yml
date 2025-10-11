@@ -2,6 +2,8 @@ version: "3.8"
 
 services:
   mongodb:
+    ports:
+      - "27017:27017"
     image: mongo:latest
     container_name: mongodb
     restart: always
