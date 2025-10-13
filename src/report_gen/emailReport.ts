@@ -1,13 +1,12 @@
 import { createObjectCsvStringifier } from "csv-writer";
-import { prisma } from "../handler/db.ts";
 import { Email, type File } from "../handler/email.ts";
 import type { Webhook } from "../webhook/traits.ts";
 import { CustomError } from "../errors/error.ts";
 import schedule from "node-schedule";
 import {managerEmail} from "../wellknown/emails.ts";
+import {POINTS_SCHEMA} from "../workspace/workon/points_schema.ts";
 
 interface Data {
-  id: number;
   accessCode: string | null;
   employeeName: string | null;
   employeeId: number | null;
@@ -23,7 +22,7 @@ interface Data {
 // Fetch data from the past 7 days
 async function fetchData(): Promise<Data[] | Error> {
   try {
-    const data = await prisma.new_Table_Name.findMany();
+    const data = await POINTS_SCHEMA.find({});
     return JSON.parse(JSON.stringify(data));
   } catch (err: any) {
     console.error("Error fetching data:", err);
