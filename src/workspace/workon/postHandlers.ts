@@ -36,7 +36,7 @@ function generateEmailBody(data: PointsDetails): string {
     message += `Reason: ${data.reason}\n`;
     message += `Comments: ${data.comments || "N/A"}\n\n`;
     message += `Points: ${data.points}\n\n`;
-    message += "Thank you,\nStudent Scheduler\n";
+    message += "Thank you,\nHFS Office\n";
 
     return message;
 }
