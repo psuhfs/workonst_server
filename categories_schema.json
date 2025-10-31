@@ -4838,6 +4838,11 @@
           ],
           "WALK-IN PRODUCE": [
             {
+              "item_id": "3640",
+              "name": "PRD VEG TOMATILLOS",
+              "unit_sz": "LB"
+            },
+            {
               "item_id": "3979",
               "name": "MUSHROOM CRIMINI",
               "unit_sz": "LB"
@@ -5297,7 +5302,7 @@
             {
               "item_id": "2080",
               "name": "CHOCOLATE DIPPED CHOC CHIP COOKIE",
-              "unit_sz": "DOZEN"
+              "unit_sz": "1/2 DOZEN"
             },
             {
               "item_id": "2408",
@@ -6245,7 +6250,7 @@
             {
               "item_id": "2080",
               "name": "CHOCOLATE DIPPED CHOC CHIP COOKIE",
-              "unit_sz": "DOZEN"
+              "unit_sz": "1/2 DOZEN"
             },
             {
               "item_id": "2107",
@@ -8301,7 +8306,7 @@
             {
               "item_id": "2080",
               "name": "CHOCOLATE DIPPED CHOC CHIP COOKIE",
-              "unit_sz": "DOZEN"
+              "unit_sz": "1/2 DOZEN"
             },
             {
               "item_id": "2408",
