@@ -3766,6 +3766,11 @@
           ],
           "DRY STORAGE - FOOD": [
             {
+              "item_id": "3855",
+              "name": "ROLL AMOROSO",
+              "unit_sz": "7\" CASE"
+            },
+            {
               "item_id": "4552",
               "name": "NUT PIGNOLI PINE NUTS",
               "unit_sz": "LB"
@@ -4564,9 +4569,9 @@
               "unit_sz": "EACH"
             },
             {
-              "item_id": "6328",
+              "item_id": "4373",
               "name": "REGISTER TAPE STICKY",
-              "unit_sz": "EACH"
+              "unit_sz": "80MM CASE"
             },
             {
               "item_id": "2344",
@@ -5931,9 +5936,9 @@
               "unit_sz": "Case"
             },
             {
-              "item_id": "6328",
-              "name": "Register Tape Sticky",
-              "unit_sz": "Case"
+              "item_id": "4373",
+              "name": "REGISTER TAPE STICKY",
+              "unit_sz": "80MM CASE"
             },
             {
               "item_id": "971",
