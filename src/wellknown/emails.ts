@@ -1,1 +1,1 @@
-export const managerEmail = process.env.MANAGER || "abg6200@psu.edu";
+export const managerEmail = process.env.MANAGER || "sdr5549@psu.edu";

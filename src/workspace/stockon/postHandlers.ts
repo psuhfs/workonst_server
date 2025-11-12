@@ -8,6 +8,7 @@ import {handleAuth,} from "../../auth/handler.ts";
 import {DateTime} from "luxon";
 import {extractTokenDetails, extractTokenFromHeaders} from "../../auth/token_extractor.ts";
 import {managerEmail} from "../../wellknown/emails.ts";
+import {getEmailsForOrders} from "../../wellknown/area_email_config.ts";
 import {order} from "../../dbUtils/order_schema.ts";
 import {DiscordWebhook} from "../../webhook/discord.ts";
 import {CustomError} from "../../errors/error.ts";
@@ -51,7 +52,21 @@ export class StockEmailSender implements RequestHandler {
             let ref_email = access_code.endsWith("@psu.edu")
                 ? access_code
                 : `${access_code}@psu.edu`;
-            let emails = [managerEmail, ref_email].join(", ");
+            
+            // Get area-specific emails based on order locations/areas
+            const areaEmails = getEmailsForOrders(body.items);
+
+            // Combine all recipients: manager (fallback), area-specific emails, and user email
+            const allRecipients = new Set<string>([ref_email]);
+            
+            // Add area-specific emails if any exist, otherwise use manager email as fallback
+            if (areaEmails.length > 0) {
+                areaEmails.forEach(email => allRecipients.add(email));
+            }
+            // ALways send a copy to <manager>
+            allRecipients.add(managerEmail);
+            
+            let emails = Array.from(allRecipients).join(", ");
 
             let email = new Email({
                 to: emails,
