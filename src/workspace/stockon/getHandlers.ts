@@ -3,6 +3,7 @@ import type {CustomResponse} from "../../http/response.ts";
 import type {RequestHandler} from "../../http/traits.ts";
 import {extractTokenDetails, extractTokenFromHeaders} from "../../auth/token_extractor.ts";
 import {getUserByUsername} from "../../dbUtils/user_schema.ts";
+import {getCategories} from "../../dbUtils/categories_schema.ts";
 
 export class GetItems implements RequestHandler {
     async handle(req: Request): Promise<CustomResponse> {
@@ -29,8 +30,7 @@ export class GetItems implements RequestHandler {
                 return unauthorized();
             }
 
-            const read = Bun.file("categories_schema.json");
-            let json = await read.json();
+            let json = await getCategories();
             let filtered = this.filterObjectKeys(json, user.stockOnAccess);
 
             return success(filtered, req.headers.get("Origin"));
