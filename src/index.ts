@@ -4,6 +4,8 @@ import { DiscordWebhook } from "./webhook/discord.ts";
 import { startBackgroundTask } from "./report_gen/emailReport.ts";
 import { DebugWebhook } from "./webhook/debug.ts";
 import { validate } from "./init_validator.ts";
+import "./dbUtils/categories_schema.ts";
+import { startCategoriesSync } from "./tasks/categoriesSync.ts";
 
 dotenv.config();
 validate();
@@ -13,6 +15,7 @@ let webhook = process.env.WEBHOOK
   : new DebugWebhook();
 
 await startBackgroundTask(webhook);
+await startCategoriesSync(webhook);
 
 const server = Bun.serve({
   port: process.env.PORT,
