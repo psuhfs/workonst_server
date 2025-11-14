@@ -8,38 +8,36 @@ await mongoose.connect(uri ? uri : "", {
   dbName: DBCollection.STOCKON,
 });
 
-const itemSchema = new mongoose.Schema(
+const categoryItemSchema = new mongoose.Schema(
   {
-    item_id: { type: String, required: true },
-    name: { type: String, required: true },
-    unit_sz: { type: String, required: true },
+    location: { type: String, required: true, index: true },
+    area: { type: String, required: true },
+    category: { type: String, required: true },
+    item_id: { type: String, default: "" },
+    name: { type: String, default: "" },
+    unit_sz: { type: String, default: "" },
   },
-  { _id: false }
+  { timestamps: true }
 );
 
-const areaSchema = new mongoose.Schema(
-  {
-    name: { type: String, required: true },
-    info: {
-      type: Map,
-      of: [itemSchema],
-    },
-  },
-  { _id: false }
+categoryItemSchema.index({ location: 1, area: 1, category: 1 });
+
+export const CATEGORY_ITEMS = mongoose.model(
+  Collections.CATEGORY_ITEMS,
+  categoryItemSchema
 );
 
-const categoriesSchema = new mongoose.Schema(
+const categoriesMetaSchema = new mongoose.Schema(
   {
     location: { type: String, required: true, unique: true },
-    areas: [areaSchema],
     lastSynced: { type: Date, default: Date.now },
   },
   { timestamps: true }
 );
 
-export const CATEGORIES_SCHEMA = mongoose.model(
-  Collections.CATEGORIES,
-  categoriesSchema
+export const CATEGORIES_META = mongoose.model(
+  Collections.CATEGORIES_META,
+  categoriesMetaSchema
 );
 
 const sourceItemSchema = new mongoose.Schema({
@@ -119,10 +117,10 @@ async function scrapeFromMongo(): Promise<any> {
     ]);
 
     return {
-      Stacks: transformToCategories(stacks),
-      Biscotti: transformToCategories(biscotti),
-      Provisions: transformToCategories(provisions),
-      Outpost: transformToCategories(outpost),
+      Stacks: stacks,
+      Biscotti: biscotti,
+      Provisions: provisions,
+      Outpost: outpost,
     };
   } catch (e) {
     console.error("Error scraping from MongoDB:", e);
@@ -136,43 +134,62 @@ function deepEqual(obj1: any, obj2: any): boolean {
 
 export async function syncFromMongoToCategories() {
   try {
-    // console.log("Starting sync from MongoDB collections...");
-    
     const scrapedData = await scrapeFromMongo();
     if (!scrapedData) {
       console.error("Failed to scrape data from MongoDB");
       return;
     }
 
-    const hasData = Object.values(scrapedData).some(
-      (loc: any) => loc.areas && loc.areas.length > 0
+    const hasScrapedData = Object.values(scrapedData).some(
+      (items: any) => items && items.length > 0
     );
     
-    if (!hasData) {
-      // console.warn("Scraped data is empty");
+    if (!hasScrapedData) {
+      // No data in source collections - check if DB was modified and sync to file
+      await syncDbToFile();
       return;
     }
 
-    const currentData = await getCategories();
+    // Source collections have data - sync from them to DB
+    const currentItems = await CATEGORY_ITEMS.find({}).lean();
+    const currentData: any = {};
+    for (const item of currentItems) {
+      if (!currentData[item.location]) currentData[item.location] = [];
+      currentData[item.location].push(item);
+    }
 
     if (deepEqual(scrapedData, currentData)) {
-      console.log("No changes detected, skipping sync");
       return;
     }
 
-    console.log("Changes detected, creating backup...");
+    console.log("Changes detected in source collections, creating backup...");
     await createBackup();
 
-    for (const [location, config] of Object.entries(scrapedData)) {
-      await CATEGORIES_SCHEMA.findOneAndUpdate(
+    for (const [location, items] of Object.entries(scrapedData)) {
+      await CATEGORY_ITEMS.deleteMany({ location });
+      
+      const itemsToInsert = (items as any[]).map(item => ({
+        location,
+        area: item.Area,
+        category: item.Category,
+        item_id: item.Item_ID,
+        name: item.Name,
+        unit_sz: item.Unit_Size,
+      }));
+
+      if (itemsToInsert.length > 0) {
+        await CATEGORY_ITEMS.insertMany(itemsToInsert);
+      }
+
+      await CATEGORIES_META.findOneAndUpdate(
         { location },
-        { location, areas: (config as any).areas, lastSynced: new Date() },
+        { location, lastSynced: new Date() },
         { upsert: true, new: true }
       );
     }
 
     await syncDbToFile();
-    console.log("Categories synced from MongoDB collections");
+    console.log("Categories synced from source collections");
   } catch (e) {
     console.error("Error syncing from MongoDB:", e);
   }
@@ -184,9 +201,33 @@ async function syncFileToDb() {
     const data = JSON.parse(fileContent);
 
     for (const [location, config] of Object.entries(data)) {
-      await CATEGORIES_SCHEMA.findOneAndUpdate(
+      const areas = (config as any).areas || [];
+      
+      await CATEGORY_ITEMS.deleteMany({ location });
+      
+      const itemsToInsert: any[] = [];
+      for (const area of areas) {
+        for (const [category, items] of Object.entries(area.info)) {
+          for (const item of items as any[]) {
+            itemsToInsert.push({
+              location,
+              area: area.name,
+              category,
+              item_id: item.item_id,
+              name: item.name,
+              unit_sz: item.unit_sz,
+            });
+          }
+        }
+      }
+
+      if (itemsToInsert.length > 0) {
+        await CATEGORY_ITEMS.insertMany(itemsToInsert);
+      }
+
+      await CATEGORIES_META.findOneAndUpdate(
         { location },
-        { location, areas: (config as any).areas, lastSynced: new Date() },
+        { location, lastSynced: new Date() },
         { upsert: true, new: true }
       );
     }
@@ -198,33 +239,76 @@ async function syncFileToDb() {
 
 async function syncDbToFile() {
   try {
-    const categories = await CATEGORIES_SCHEMA.find({});
+    const items = await CATEGORY_ITEMS.find({}).lean();
     const data: any = {};
 
-    for (const category of categories) {
-      data[category.location] = {
-        areas: category.areas,
-      };
+    for (const item of items) {
+      if (!data[item.location]) {
+        data[item.location] = { areas: [] };
+      }
+
+      let area = data[item.location].areas.find((a: any) => a.name === item.area);
+      if (!area) {
+        area = { name: item.area, info: {} };
+        data[item.location].areas.push(area);
+      }
+
+      if (!area.info[item.category]) {
+        area.info[item.category] = [];
+      }
+
+      area.info[item.category].push({
+        item_id: item.item_id,
+        name: item.name,
+        unit_sz: item.unit_sz,
+      });
     }
 
-    await fs.writeFile(CATEGORIES_FILE, JSON.stringify(data, null, 2));
-    console.log("Categories synced from DB to file");
+    const newContent = JSON.stringify(data, null, 2);
+    const currentContent = await Bun.file(CATEGORIES_FILE).text().catch(() => "");
+    
+    if (newContent !== currentContent) {
+      await createBackup();
+      await fs.writeFile(CATEGORIES_FILE, newContent);
+      console.log("Categories synced from DB to file");
+    }
   } catch (e) {
     console.error("Error syncing DB to file:", e);
   }
 }
 
 export async function getCategories(): Promise<any> {
-  const categories = await CATEGORIES_SCHEMA.find({});
+  const items = await CATEGORY_ITEMS.find({}).lean();
   const data: any = {};
 
-  for (const category of categories) {
-    data[category.location] = {
-      areas: category.areas,
-    };
+  for (const item of items) {
+    if (!data[item.location]) {
+      data[item.location] = { areas: [] };
+    }
+
+    let area = data[item.location].areas.find((a: any) => a.name === item.area);
+    if (!area) {
+      area = { name: item.area, info: {} };
+      data[item.location].areas.push(area);
+    }
+
+    if (!area.info[item.category]) {
+      area.info[item.category] = [];
+    }
+
+    area.info[item.category].push({
+      item_id: item.item_id,
+      name: item.name,
+      unit_sz: item.unit_sz,
+    });
   }
 
   return data;
 }
 
-await syncFileToDb();
+// Only sync file to DB if DB is empty (first run)
+const itemCount = await CATEGORY_ITEMS.countDocuments();
+if (itemCount === 0) {
+  // console.log("DB is empty, syncing from file...");
+  await syncFileToDb();
+}

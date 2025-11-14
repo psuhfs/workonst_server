@@ -103,5 +103,6 @@ export const enum Collections {
   ORDERS = "orders",
   CREW_MEMBERS = "crew_members",
   POINTS = "points",
-  CATEGORIES = "categories",
+  CATEGORY_ITEMS = "category_items",
+  CATEGORIES_META = "categories_meta",
 }
