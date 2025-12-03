@@ -38,8 +38,8 @@ export class Email implements Sendable {
     try {
       // Create a transporter with your email service credentials
       const transporter = nodemailer.createTransport({
-        host: "smtp.hostinger.com",
-        port: 465,
+        host: process.env.EMAIL_HOST,
+        port: process.env.EMAIL_PORT,
         secure: true,
         auth: {
           user: process.env.EMAIL,
