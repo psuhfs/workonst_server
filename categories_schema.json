@@ -2477,7 +2477,7 @@
             {
               "item_id": "0751",
               "name": "MILK HALF&HALF QUART",
-              "unit_sz": "QT"
+              "unit_sz": "12/CRATE"
             },
             {
               "item_id": "1521",
@@ -2507,7 +2507,7 @@
             {
               "item_id": "1362",
               "name": "CRM WHIPPING HEAVY QT",
-              "unit_sz": "QT"
+              "unit_sz": "12/CRATE"
             },
             {
               "item_id": "0466",
@@ -2699,7 +2699,7 @@
             {
               "item_id": "",
               "name": "PINTS",
-              "unit_sz": ""
+              "unit_sz": "6/CS"
             },
             {
               "item_id": "7742",
@@ -5088,12 +5088,12 @@
             {
               "item_id": "0751",
               "name": "MILK HALF&HALF QUART",
-              "unit_sz": "QT"
+              "unit_sz": "12/CRATE"
             },
             {
               "item_id": "1362",
               "name": "CRM WHIPPING HEAVY QT",
-              "unit_sz": "QT"
+              "unit_sz": "12/CRATE"
             },
             {
               "item_id": "0466",
@@ -5386,7 +5386,7 @@
             {
               "item_id": "1362",
               "name": "CRM Whipping Heavy",
-              "unit_sz": "QT"
+              "unit_sz": "12/CRATE"
             },
             {
               "item_id": "4223",
